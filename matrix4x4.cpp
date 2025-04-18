@@ -1,6 +1,6 @@
 #include <Novice.h>
 #include "matrix4x4.h"
-
+#include <cmath>
 
 Matrix4x4 Add(Matrix4x4 m1, Matrix4x4 m2)
 {
@@ -212,6 +212,46 @@ Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix)
 	}
 
 	return { x, y, z };
+}
+
+Matrix4x4 MakeRoateXMatrix(float radian)
+{
+	Matrix4x4 result = {};
+
+	result.m[0][0] = 1.0f;
+	result.m[1][1] = cosf(radian);
+	result.m[1][2] = sinf(radian);
+	result.m[2][1] = -sinf(radian);
+	result.m[2][2] = cosf(radian);
+	result.m[3][3] = 1.0f;
+
+	return result;
+}
+Matrix4x4 MakeRoateYMatrix(float radian)
+{
+	Matrix4x4 result = {};
+
+	result.m[0][0] = std::cosf(radian);
+	result.m[0][2] = -std::sinf(radian);
+	result.m[1][1] = 1.0f;
+	result.m[2][0] = std::sin(radian);
+	result.m[2][2] = std::cosf(radian);
+	result.m[3][3] = 1.0f;
+
+	return result;
+}
+Matrix4x4 MakeRoateZMatrix(float radian)
+{
+	Matrix4x4 result = {};
+
+	result.m[0][0] = std::cosf(radian);
+	result.m[0][1] = std::sinf(radian);
+	result.m[1][0] = -std::sinf(radian);
+	result.m[1][1] = std::cosf(radian);
+	result.m[2][2] = 1.0f;
+	result.m[3][3] = 1.0f;
+
+	return result;
 }
 
 void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix)

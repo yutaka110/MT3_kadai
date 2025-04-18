@@ -13,19 +13,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char preKeys[256] = {0};
 
 	//変数の初期化
-	Vector3 translate{ 4.1f,2.6f,0.8f };
-
-	Vector3 scale{ 1.5f,5.2f,7.3f };
-
-	Vector3 point{ 2.3f,3.8f,1.4f };
-
-	Matrix4x4 transformMatrix =
-	{
-	   1.0f,2.0f,3.0f,4.0f,
-	   3.0f,1.0f,1.0f,2.0f,
-	   1.0f,4.0f,2.0f,3.0f,
-	   2.0f,2.0f,1.0f,3.0f
-	};
+	Vector3 roate{ 0.4f,1.43f,-0.8f };
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -40,14 +28,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 
-		//座標返還
-		Vector3 transform = Transform(point, transformMatrix);
-
-		//平行移動行列を使った計算
-		Matrix4x4 translateMatrix = MakeTranslateMatrix(translate);
-
-		//拡大縮小行列を使った計算
-		Matrix4x4 scaleMatrix = MakeScaleMatrix(scale);
+		//回転行列を使った計算
+		Matrix4x4 roateXMatrix = MakeRoateXMatrix(roate.x);
+		Matrix4x4 roateYMatrix = MakeRoateYMatrix(roate.y);
+		Matrix4x4 roateZMatrix = MakeRoateZMatrix(roate.z);
+		Matrix4x4 roateXYZMatrix = Multiply(roateXMatrix, Multiply(roateYMatrix, roateZMatrix));
 
 		///
 		/// ↑更新処理ここまで
@@ -57,11 +42,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓描画処理ここから
 		///
 
-		//ベクトル,行列の数値表示
-		VectorScreenPrintf(0, 0, transform,"transformed");
-		MatrixScreenPrintf(0, 20*5, translateMatrix);
-		MatrixScreenPrintf(0, 20 * 5*2 , scaleMatrix);
-
+		//行列の数値表示
+		MatrixScreenPrintf(0, 0, roateXMatrix);
+		MatrixScreenPrintf(0, 20 * 5, roateYMatrix);
+		MatrixScreenPrintf(0, 20 * 5*2 , roateZMatrix);
+		MatrixScreenPrintf(0, 20 * 5 *3, roateXYZMatrix);
+		
 		///
 		/// ↑描画処理ここまで
 		///
