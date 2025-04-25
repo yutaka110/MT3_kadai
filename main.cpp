@@ -13,9 +13,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char preKeys[256] = {0};
 
 	//変数の初期化
-	Vector3 scale{ 1.2f,0.79f,-2.1f };
-	Vector3 rotate{ 0.4f,1.43f,-0.8f };
-	Vector3 translate{ 2.7f,-4.15f,1.57f };
+
+	
+
+
 	
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -30,14 +31,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 
-		////回転行列を使った計算
-		//Matrix4x4 roateXMatrix = MakeRoateXMatrix(roate.x);
-		//Matrix4x4 roateYMatrix = MakeRoateYMatrix(roate.y);
-		//Matrix4x4 roateZMatrix = MakeRoateZMatrix(roate.z);
-		//Matrix4x4 roateXYZMatrix = Multiply(roateXMatrix, Multiply(roateYMatrix, roateZMatrix));
 
-		//アフィン変換行列
-		Matrix4x4 worldMatrix = MakeAffineMatrix(scale, rotate, translate);
+		
+
+		//正射影行列
+		Matrix4x4 orthographicMatrix = MakeOrthographicMatrix(-160.0f, 160.f, 200.0f, 300.0f, 0.0f, 1000.0f);
+
+		//透視投影行列
+		Matrix4x4 perspectiveFovMatrix = MakePrespectiveFovMattrix(0.63f, 1.33f, 0.1f, 1000.0f);
+
+		//ビューポート変換行列
+		Matrix4x4 viewportMatrix = MakeViewportMatrix(100.0f, 200.0f, 600.0f, 300.0f, 0.0f, 1.0f);
 
 
 		///
@@ -54,8 +58,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//MatrixScreenPrintf(0, 20 * 5*2 , roateZMatrix);
 		//MatrixScreenPrintf(0, 20 * 5 *3, roateXYZMatrix);
 
-		//行列の数値表示
-		MatrixScreenPrintf(0, 0, worldMatrix);
+
+		MatrixScreenPrintf(0, 0, orthographicMatrix);
+		MatrixScreenPrintf(0, 20 * 5, perspectiveFovMatrix);
+		MatrixScreenPrintf(0, 20 * 5*2 , viewportMatrix);
+
 		
 		///
 		/// ↑描画処理ここまで
