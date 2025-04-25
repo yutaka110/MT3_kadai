@@ -255,6 +255,7 @@ Matrix4x4 MakeRoateZMatrix(float radian)
 }
 
 
+
 Matrix4x4 MakePrespectiveFovMattrix(float fovY, float aspectRatio, float nearClip, float farClip)
 {
 	Matrix4x4 result;
@@ -288,6 +289,40 @@ Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, f
 	result.m[3][0] = left +  (width/2.0f);    result.m[3][1] = top + height/2.0f;    result.m[3][2] = minDepth;    result.m[3][3] = 1.0f;
 
 	return result;
+}
+
+
+
+Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate)
+{
+	
+	Matrix4x4 scaleMatrix = {};
+	scaleMatrix.m[0][0] = scale.x;
+	scaleMatrix.m[1][1] = scale.y;
+	scaleMatrix.m[2][2] = scale.z;
+	scaleMatrix.m[3][3] = 1.0f;
+
+	
+	Matrix4x4 rotateXMatrix = MakeRoateXMatrix(rotate.x);
+	Matrix4x4 rotateYMatrix = MakeRoateYMatrix(rotate.y);
+	Matrix4x4 rotateZMatrix = MakeRoateZMatrix(rotate.z);
+
+	Matrix4x4 rotateMatrix = Multiply(Multiply(rotateXMatrix, rotateYMatrix), rotateZMatrix);
+
+	
+	Matrix4x4 translateMatrix = {};
+	translateMatrix.m[0][0] = 1.0f;
+	translateMatrix.m[1][1] = 1.0f;
+	translateMatrix.m[2][2] = 1.0f;
+	translateMatrix.m[3][3] = 1.0f;
+	translateMatrix.m[3][0] = translate.x;
+	translateMatrix.m[3][1] = translate.y;
+	translateMatrix.m[3][2] = translate.z;
+
+	
+	Matrix4x4 affineMatrix = Multiply(Multiply(scaleMatrix, rotateMatrix), translateMatrix);
+
+	return affineMatrix;
 }
 
 

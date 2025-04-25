@@ -13,7 +13,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char preKeys[256] = {0};
 
 	//変数の初期化
+
 	
+
 
 	
 	// ウィンドウの×ボタンが押されるまでループ
@@ -29,6 +31,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 
+
 		
 
 		//正射影行列
@@ -40,6 +43,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//ビューポート変換行列
 		Matrix4x4 viewportMatrix = MakeViewportMatrix(100.0f, 200.0f, 600.0f, 300.0f, 0.0f, 1.0f);
 
+
 		///
 		/// ↑更新処理ここまで
 		///
@@ -48,10 +52,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓描画処理ここから
 		///
 
-		//行列の数値表示
+		////行列の数値表示
+		//MatrixScreenPrintf(0, 0, roateXMatrix);
+		//MatrixScreenPrintf(0, 20 * 5, roateYMatrix);
+		//MatrixScreenPrintf(0, 20 * 5*2 , roateZMatrix);
+		//MatrixScreenPrintf(0, 20 * 5 *3, roateXYZMatrix);
+
+
 		MatrixScreenPrintf(0, 0, orthographicMatrix);
 		MatrixScreenPrintf(0, 20 * 5, perspectiveFovMatrix);
 		MatrixScreenPrintf(0, 20 * 5*2 , viewportMatrix);
+
 		
 		///
 		/// ↑描画処理ここまで
