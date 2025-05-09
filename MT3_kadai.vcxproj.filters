@@ -16,11 +16,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="C:\KamataEngine\Adapter\Novice.cpp">
       <Filter>KamataEngine\Adapter</Filter>
     </ClCompile>
     <ClCompile Include="matrix4x4.cpp">
+      <Filter>KamataEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
       <Filter>KamataEngine</Filter>
     </ClCompile>
   </ItemGroup>
