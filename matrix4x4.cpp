@@ -256,7 +256,7 @@ Matrix4x4 MakeRoateZMatrix(float radian)
 
 
 
-Matrix4x4 MakePrespectiveFovMattrix(float fovY, float aspectRatio, float nearClip, float farClip)
+Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip)
 {
 	Matrix4x4 result;
 	result.m[0][0] = (1.0f/aspectRatio)*(1.0f/tanf(fovY/2.0f)); result.m[0][1] = 0.0f;    result.m[0][2] = 0.0f;    result.m[0][3] = 0;
@@ -346,7 +346,14 @@ void VectorScreenPrintf(int x, int y, const Vector3 vector, const char* label)
 	static const int kColumnWidth = 60;
 	Novice::ScreenPrintf(x, y, "%.02f", vector.x);
 	Novice::ScreenPrintf(x + kColumnWidth, y, "%.02f", vector.y);
-	Novice::ScreenPrintf(x + kColumnWidth * 2, y, "%.02f", vector.z);
+	Novice::ScreenPrintf(x + kColumnWidth * 2, y, "%.02f", vector.z); 
 	Novice::ScreenPrintf(x + kColumnWidth * 3, y, "%s", label);
 
+}
+
+Vector3 Cross(const Vector3& v1, const Vector3& v2)
+{
+	Vector3 result;
+	result.x = v1.y * v2.z - v1.z * v2.y; result.y = v1.z * v2.x - v1.x * v2.z; result.z = v1.x * v2.y - v1.y * v2.x;
+	return result;
 }
