@@ -1,7 +1,12 @@
 #include <Novice.h>
 #include "matrix4x4.h"
 #include <cmath>
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
+#include<math.h>
+#define _USE_MATH_DEFINES
 Matrix4x4 Add(Matrix4x4 m1, Matrix4x4 m2)
 {
 	Matrix4x4 result;
@@ -357,3 +362,98 @@ Vector3 Cross(const Vector3& v1, const Vector3& v2)
 	result.x = v1.y * v2.z - v1.z * v2.y; result.y = v1.z * v2.x - v1.x * v2.z; result.z = v1.x * v2.y - v1.y * v2.x;
 	return result;
 }
+
+void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix) {
+	const float kGridHalfWidth = 2.0f;           
+	const uint32_t kSubdivision = 10;            
+	const float kGridEvery = (kGridHalfWidth * 2.0f) / float(kSubdivision); 
+
+	
+	Matrix4x4 vpvpMatrix = Multiply(viewProjectionMatrix, viewportMatrix);
+
+	for (uint32_t xIndex = 0; xIndex <= kSubdivision; ++xIndex) {
+		float x = -kGridHalfWidth + xIndex * kGridEvery;
+
+		
+		Vector3 start = { x, 0, -kGridHalfWidth };
+		Vector3 end = { x, 0,  kGridHalfWidth };
+		
+		
+		
+	
+		
+			 
+		Vector3 screenStart = Transform(start, vpvpMatrix);
+		Vector3 screenEnd = Transform(end, vpvpMatrix);
+
+		
+		Novice::DrawLine(int(screenStart.x), int(screenStart.y),
+			int(screenEnd.x), int(screenEnd.y),
+			WHITE);
+	}
+
+	
+	for (uint32_t zIndex = 0; zIndex <= kSubdivision; ++zIndex) {
+		
+			float z = -kGridHalfWidth + zIndex * kGridEvery;
+
+			Vector3 start = { -kGridHalfWidth, 0.0f, z };
+			Vector3 end = { +kGridHalfWidth, 0.0f, z };
+
+			Vector3 screenStart = Transform(start, vpvpMatrix);
+			Vector3 screenEnd = Transform(end, vpvpMatrix);
+
+			Novice::DrawLine(
+				int(screenStart.x), int(screenStart.y),
+				int(screenEnd.x), int(screenEnd.y),
+				WHITE
+			);
+		
+	}
+}
+
+void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, int color) {
+	const uint32_t kSubdivision = 16;                    
+	const float kLonEvery = 2.0f * float(M_PI) / kSubdivision; 
+	const float kLatEvery = float(M_PI) / kSubdivision;        
+
+	
+	Matrix4x4 vpvpMatrix = Multiply(viewProjectionMatrix, viewportMatrix);
+
+	for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex) {
+		float lat = -float(M_PI) / 2.0f + kLatEvery * latIndex;
+
+		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; ++lonIndex) {
+			float lon = lonIndex * kLonEvery;
+
+			
+			Vector3 a = {
+				sphere.center.x + sphere.radius * cosf(lat) * cosf(lon),
+				sphere.center.y + sphere.radius * sinf(lat),
+				sphere.center.z + sphere.radius * cosf(lat) * sinf(lon)
+			};
+			Vector3 b = {
+				sphere.center.x + sphere.radius * cosf(lat + kLatEvery) * cosf(lon),
+				sphere.center.y + sphere.radius * sinf(lat + kLatEvery),
+				sphere.center.z + sphere.radius * cosf(lat + kLatEvery) * sinf(lon)
+			};
+			Vector3 c = {
+				sphere.center.x + sphere.radius * cosf(lat) * cosf(lon + kLonEvery),
+				sphere.center.y + sphere.radius * sinf(lat),
+				sphere.center.z + sphere.radius * cosf(lat) * sinf(lon + kLonEvery)
+			};
+
+			
+			Vector3 screenA = Transform(a, vpvpMatrix);
+			Vector3 screenB = Transform(b, vpvpMatrix);
+			Vector3 screenC = Transform(c, vpvpMatrix);
+
+			
+			Novice::DrawLine((int)screenA.x, (int)screenA.y, (int)screenB.x, (int)screenB.y, color);
+			Novice::DrawLine((int)screenA.x, (int)screenA.y, (int)screenC.x, (int)screenC.y, color);
+		}
+	}
+}
+
+
+//void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix)
