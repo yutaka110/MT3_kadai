@@ -11,6 +11,12 @@ struct Vector3
 	float z;
 };
 
+struct Sphere
+{
+	Vector3 center;
+	float radius;
+};
+
 
 Matrix4x4 Add(Matrix4x4 m1, Matrix4x4 m2);
 Matrix4x4 Subtract(Matrix4x4 m1, Matrix4x4 m2);
@@ -31,6 +37,8 @@ Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, f
 
 Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate);
 
+void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix);
+void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, int color);
 void VectorScreenPrintf(int x, int y, const Vector3 vector, const char* label);
 void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix);
 Vector3 Cross(const Vector3& v1, const Vector3& v2);
