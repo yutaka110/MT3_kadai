@@ -41,6 +41,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 v1{ 1.2f, -3.9f, 2.5f };
 	Vector3 v2{ 2.8f, 0.4f, -1.3f };
 	
+	Segment segment{ {-2.0f, -1.0f, 0.0f}, {3.0f, 2.0f, 2.0f} };
+	Vector3 point{ -1.5f, 0.6f, 0.6f };
+
+	
+
 
 	
 	Matrix4x4 worldMatrix;
@@ -50,6 +55,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Matrix4x4 worldViewProjectionMatrix;
 	Matrix4x4 viewportMatrix;
 
+	
 
 	
 	// ウィンドウの×ボタンが押されるまでループ
@@ -93,6 +99,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Vector3 cross = Cross(v1, v2);
 		
 
+		// point を線分に射影したベクトル
+		Vector3 project = Project(Subtract(point, segment.origin), segment.diff);
+
+
+		// 線分上の最近接点
+		Vector3 closestPoint = ClosestPoint(point, segment);
+
+		Sphere pointSphere{ point, 0.01f };        // 点の可視化用の球（赤）
+		Sphere closestPointSphere{ closestPoint, 0.01f }; // 最近接点の可視化用の球（黒）
+
+		DrawSphere(pointSphere, worldViewProjectionMatrix, viewportMatrix, RED);
+		DrawSphere(closestPointSphere, worldViewProjectionMatrix, viewportMatrix, BLACK);
+
+
 		// 各種行列の計算
 	   worldMatrix = MakeAffineMatrix({ 1.0f, 1.0f, 1.0f }, cameraRotate, cameraTranslate);
 	   cameraMatrix = MakeAffineMatrix({ 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 0.0f }, cameraPosition);
@@ -102,7 +122,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	   viewportMatrix = MakeViewportMatrix(0, 0, float(kWindowWidth), float(kWindowHeight), 0.0f, 1.0f);
 
 	  
-
 		/*Vector3 screenVertices[3];
 		for (uint32_t i = 0; i < 3; ++i) {
 			Vector3 ndcVertex = Transform(kLocalVertices[i], worldViewProjectionMatrix);
@@ -117,6 +136,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 		/// ↓描画処理ここから
 		///
+
+
+	   Vector3 start = Transform(Transform(segment.origin, worldViewProjectionMatrix), viewportMatrix);
+	   Vector3 end = Transform(Transform(Add(segment.origin, segment.diff), worldViewProjectionMatrix), viewportMatrix);
+
+	   Novice::DrawLine(
+		   int(start.x), int(start.y),
+		   int(end.x), int(end.y),
+		   WHITE
+	   );
 
 		
 	   DrawGrid(worldViewProjectionMatrix, viewportMatrix);
@@ -137,6 +166,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.01f);
 		ImGui::DragFloat3("SphereCenter", &sphere.center.x, 0.01f);
 		ImGui::DragFloat("SphereRadius", &sphere.radius, 0.01f);
+		ImGui::InputFloat3("Project", &project.x, "%.3f", ImGuiInputTextFlags_ReadOnly);
 
 		ImGui::End();
 		
