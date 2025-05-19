@@ -1,6 +1,8 @@
+
 #include <Novice.h>
 #include "matrix4x4.h"
 #include <cmath>
+
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
@@ -362,6 +364,55 @@ Vector3 Cross(const Vector3& v1, const Vector3& v2)
 	result.x = v1.y * v2.z - v1.z * v2.y; result.y = v1.z * v2.x - v1.x * v2.z; result.z = v1.x * v2.y - v1.y * v2.x;
 	return result;
 }
+
+//Vector3 Project(const Vector3& v1, const Vector3& v2)
+//{
+//	Vector3 result;
+//	 result.x= ((v2.x*v2.x+v2.y*v2.y+v2.z*v2.z)  * (1.0f/v1.x* v2.x + v1.y * v2.y + v1.z * v2.z))*v2.x;
+//	 result.y = ((v2.x * v2.x + v2.y * v2.y + v2.z * v2.z) * (1.0f / v1.x * v2.x + v1.y * v2.y + v1.z * v2.z)) * v2.y;
+//	 result.z = ((v2.x * v2.x + v2.y * v2.y + v2.z * v2.z) * (1.0f / v1.x * v2.x + v1.y * v2.y + v1.z * v2.z)) * v2.z;
+//
+//	 return result;
+//
+//}
+
+Vector3 Subtract(const Vector3& a, const Vector3& b) {
+	return { a.x - b.x, a.y - b.y, a.z - b.z };
+}
+
+Vector3 Add(const Vector3& a, const Vector3& b) {
+	return { a.x + b.x, a.y + b.y, a.z + b.z };
+}
+
+
+Vector3 Project(const Vector3& v1, const Vector3& v2) {
+	float dot = v1.Dot(v2);
+	float lenSq = v2.Dot(v2);
+	if (lenSq == 0.0f) return { 0, 0, 0 };
+	return v2 * (dot / lenSq);
+}
+
+Vector3 ClosestPoint(const Vector3& point, const Segment& segment) {
+	Vector3 a = segment.origin;
+	Vector3 ab = segment.diff;
+
+	Vector3 ap = point - a;
+
+	float abLenSq = ab.Dot(ab);
+	if (abLenSq == 0.0f) {
+		
+		return a;
+	}
+
+	float t = ap.Dot(ab) / abLenSq;
+
+	
+	t = (t < 0.0f) ? 0.0f : (t > 1.0f) ? 1.0f : t;
+
+	return a + ab * t;
+}
+
+
 
 void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix) {
 	const float kGridHalfWidth = 2.0f;           
