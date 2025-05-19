@@ -74,7 +74,7 @@ Vector3 Project(const Vector3& v1, const Vector3& v2);
 Vector3 ClosestPoint(const Vector3& point, const Segment& segment);
 Vector3 Subtract(const Vector3& a, const Vector3& b);
 Vector3 Add(const Vector3& a, const Vector3& b);
-
+bool IsCollision(const Sphere& s1, const Sphere& s2);
 
 void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix);
 void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, int color);

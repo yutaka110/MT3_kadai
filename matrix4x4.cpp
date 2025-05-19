@@ -412,6 +412,13 @@ Vector3 ClosestPoint(const Vector3& point, const Segment& segment) {
 	return a + ab * t;
 }
 
+bool IsCollision(const Sphere& s1, const Sphere& s2) {
+	Vector3 diff = s1.center - s2.center;
+	float distanceSq = diff.Dot(diff);
+	float radiusSum = s1.radius + s2.radius;
+	return distanceSq < (radiusSum * radiusSum);
+}
+
 
 
 void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix) {
