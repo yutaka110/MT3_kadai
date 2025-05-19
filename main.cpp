@@ -36,7 +36,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Sphere sphere;
 	sphere.center = { 0.01f,0.01f,0.01f };
-	sphere.radius = 1.0f;
+	sphere.radius = 0.1f;
+
+	Sphere sphere2;
+	sphere2.center = { 0.01f,0.01f,0.01f };
+	sphere2.radius = 0.1f;
 
 	Vector3 v1{ 1.2f, -3.9f, 2.5f };
 	Vector3 v2{ 2.8f, 0.4f, -1.3f };
@@ -149,6 +153,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		
 	   DrawGrid(worldViewProjectionMatrix, viewportMatrix);
+
+	   if (IsCollision(sphere, sphere2))
+	   {
+		   DrawSphere(sphere2, worldViewProjectionMatrix, viewportMatrix, RED);
+	   }
+	   else
+	   {
+		   DrawSphere(sphere2, worldViewProjectionMatrix, viewportMatrix, WHITE);
+	   }
+
 	   DrawSphere(sphere, worldViewProjectionMatrix, viewportMatrix, WHITE);
 
 		//// 描画
