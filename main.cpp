@@ -48,7 +48,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Segment segment{ {-2.0f, -1.0f, 0.0f}, {3.0f, 2.0f, 2.0f} };
 	Vector3 point{ -1.5f, 0.6f, 0.6f };
 
-	
+	Plane plane;
+	plane.normal = Normalize({ 0.0f, 1.0f, 0.0f });  // 上向きの単位ベクトル
+	plane.distance = 0.0f;                        // 原点を通る平面
 
 
 	
@@ -113,8 +115,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Sphere pointSphere{ point, 0.01f };        // 点の可視化用の球（赤）
 		Sphere closestPointSphere{ closestPoint, 0.01f }; // 最近接点の可視化用の球（黒）
 
-		DrawSphere(pointSphere, worldViewProjectionMatrix, viewportMatrix, RED);
-		DrawSphere(closestPointSphere, worldViewProjectionMatrix, viewportMatrix, BLACK);
+	/*	DrawSphere(pointSphere, worldViewProjectionMatrix, viewportMatrix, RED);
+		DrawSphere(closestPointSphere, worldViewProjectionMatrix, viewportMatrix, BLACK);*/
 
 
 		// 各種行列の計算
@@ -145,16 +147,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	   Vector3 start = Transform(Transform(segment.origin, worldViewProjectionMatrix), viewportMatrix);
 	   Vector3 end = Transform(Transform(Add(segment.origin, segment.diff), worldViewProjectionMatrix), viewportMatrix);
 
-	   Novice::DrawLine(
+	  /* Novice::DrawLine(
 		   int(start.x), int(start.y),
 		   int(end.x), int(end.y),
 		   WHITE
-	   );
+	   );*/
 
-		
-	   DrawGrid(worldViewProjectionMatrix, viewportMatrix);
+	   //グリッドの描画
+	   //DrawGrid(worldViewProjectionMatrix, viewportMatrix);
 
-	   if (IsCollision(sphere, sphere2))
+	   //球と球の当たり判定
+	/*   if (IsCollision(sphere, sphere2))
 	   {
 		   DrawSphere(sphere2, worldViewProjectionMatrix, viewportMatrix, RED);
 	   }
@@ -163,7 +166,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		   DrawSphere(sphere2, worldViewProjectionMatrix, viewportMatrix, WHITE);
 	   }
 
-	   DrawSphere(sphere, worldViewProjectionMatrix, viewportMatrix, WHITE);
+	   DrawSphere(sphere, worldViewProjectionMatrix, viewportMatrix, WHITE);*/
+
+
+	   //平面と球の当たり判定
+       if (IsCollision(sphere, plane))
+	   {
+		   DrawSphere(sphere, worldViewProjectionMatrix, viewportMatrix, RED);
+	   }
+	   else
+	   {
+		   DrawSphere(sphere, worldViewProjectionMatrix, viewportMatrix, WHITE);
+	   }
+
+	   //DrawSphere(sphere, worldViewProjectionMatrix, viewportMatrix, WHITE);
+
+	   DrawPlane(plane, worldViewProjectionMatrix, viewportMatrix, WHITE);
 
 		//// 描画
 		//Novice::DrawTriangle(
@@ -181,6 +199,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::DragFloat3("SphereCenter", &sphere.center.x, 0.01f);
 		ImGui::DragFloat("SphereRadius", &sphere.radius, 0.01f);
 		ImGui::InputFloat3("Project", &project.x, "%.3f", ImGuiInputTextFlags_ReadOnly);
+		// 平面の編集
+		ImGui::DragFloat3("Plane.Normal", &plane.normal.x, 0.01f);
+
+		//正規化
+		plane.normal = Normalize(plane.normal); 
 
 		ImGui::End();
 		
