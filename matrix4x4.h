@@ -57,6 +57,11 @@ struct Plane
 	float distance; 
 };
 
+struct Triangle
+{
+	Vector3 vertices[3];
+};
+
 Matrix4x4 Add(Matrix4x4 m1, Matrix4x4 m2);
 Matrix4x4 Subtract(Matrix4x4 m1, Matrix4x4 m2);
 Matrix4x4 Multiply(Matrix4x4 m1, Matrix4x4 m2);
@@ -80,6 +85,7 @@ Vector3 Project(const Vector3& v1, const Vector3& v2);
 Vector3 ClosestPoint(const Vector3& point, const Segment& segment);
 Vector3 Subtract(const Vector3& a, const Vector3& b);
 Vector3 Add(const Vector3& a, const Vector3& b);
+Vector3 Multiply(const Vector3& v, float scalar);
 float Dot(const Vector3& a, const Vector3& b);
 
 
@@ -88,10 +94,13 @@ Vector3 Multiply(float scalar, const Vector3& v);
 bool IsCollision(const Sphere& s1, const Sphere& s2);
 bool IsCollision(const Sphere& sphere, const Plane& plane);
 bool IsCollision(const Segment& segment, const Plane& plane);
+bool IsCollision(const Triangle& triangle, const Segment& segment);
 Vector3 Perpendicular(const Vector3& vector);
 void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, int color);
 void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix);
 void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, int color);
+void DrawTriangle(
+	const Triangle& triangle,const Matrix4x4& viewProjectionMatrix,const Matrix4x4& viewportMatrix,	int color);
 void VectorScreenPrintf(int x, int y, const Vector3 vector, const char* label);
 void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix);
 Vector3 Cross(const Vector3& v1, const Vector3& v2);

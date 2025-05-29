@@ -52,6 +52,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	plane.normal = Normalize({ 0.0f, 1.0f, 0.0f });  // 上向きの単位ベクトル
 	plane.distance = 0.0f;                        // 原点を通る平面
 
+	Triangle triangle = {
+	{
+		{ 0.0f,  0.5f, 0.0f },  // 上
+		{ 0.5f, -0.5f, 0.0f },  // 右下
+		{ -0.5f, -0.5f, 0.0f }  // 左下
+	}
+	};
 
 	
 	Matrix4x4 worldMatrix;
@@ -164,11 +171,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	   DrawSphere(sphere, worldViewProjectionMatrix, viewportMatrix, WHITE);*/
 
-	   Novice::DrawLine(
-		   int(start.x), int(start.y),
-		   int(end.x), int(end.y),
-		   WHITE
-	   );
+	   
 
 	   //平面と球の当たり判定
        if (IsCollision(sphere, plane))
@@ -190,9 +193,26 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		   DrawPlane(plane, worldViewProjectionMatrix, viewportMatrix, WHITE);
 	   }
 
+	   DrawTriangle(triangle, worldViewProjectionMatrix, viewportMatrix, WHITE);
+
 	   //DrawSphere(sphere, worldViewProjectionMatrix, viewportMatrix, WHITE);
 
-	  
+	   if (IsCollision(triangle, segment))
+	   {
+		   Novice::DrawLine(
+			   int(start.x), int(start.y),
+			   int(end.x), int(end.y),
+			   RED
+		   );
+	   }
+	   else
+	   {
+		   Novice::DrawLine(
+			   int(start.x), int(start.y),
+			   int(end.x), int(end.y),
+			   WHITE
+		   );
+	   }
 
 		//// 描画
 		//Novice::DrawTriangle(
@@ -212,6 +232,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::InputFloat3("Project", &project.x, "%.3f", ImGuiInputTextFlags_ReadOnly);
 		// 平面の編集
 		ImGui::DragFloat3("Plane.Normal", &plane.normal.x, 0.01f);
+
+		//Segmentの編集
+		ImGui::DragFloat3("Segment.Origin", &segment.origin.x, 0.01f);
+		ImGui::DragFloat3("Segment.Diff", &segment.diff.x, 0.01f);
 
 		//正規化
 		plane.normal = Normalize(plane.normal); 
