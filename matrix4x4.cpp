@@ -397,6 +397,10 @@ Vector3 Add(const Vector3& a, const Vector3& b) {
 	return { a.x + b.x, a.y + b.y, a.z + b.z };
 }
 
+Vector3 Multiply(const Vector3& v, float scalar) {
+	return { v.x * scalar, v.y * scalar, v.z * scalar };
+}
+
 
 Vector3 Project(const Vector3& v1, const Vector3& v2) {
 	float dot = v1.Dot(v2);
@@ -466,6 +470,63 @@ bool IsCollision(const Segment& line, const Plane& plane) {
 	
 	return true;
 }
+
+
+
+bool IsCollision(const Triangle& triangle, const Segment& segment) 
+{
+	// ステップ1：三角形の平面を構成
+	Vector3 edge1 = Subtract(triangle.vertices[1], triangle.vertices[0]);
+	Vector3 edge2 = Subtract(triangle.vertices[2], triangle.vertices[0]);
+	Vector3 normal = Normalize(Cross(edge1, edge2));
+	float distance = Dot(normal, triangle.vertices[0]);
+
+	Plane plane = { normal, distance };
+
+	// ステップ2：線分と平面が衝突するかチェック
+	Vector3 dir = segment.diff;
+	float dot = Dot(plane.normal, dir);
+
+	if (dot == 0.0f) return false; // 平行なら交差しない
+
+	// t計算（必要なときだけ）
+	float t = (plane.distance - Dot(segment.origin, plane.normal)) / dot;
+
+	// 線分外なら交点は存在しない
+	if (t < 0.0f || t > 1.0f) return false;
+
+	// ステップ3：交点を内部的に計算
+	Vector3 intersection = Add(segment.origin, Multiply(dir, t));
+
+	// ステップ4：三角形内かをクロス積で判定
+	Vector3 c0 = Cross(Subtract(triangle.vertices[1], triangle.vertices[0]), Subtract(intersection, triangle.vertices[0]));
+	Vector3 c1 = Cross(Subtract(triangle.vertices[2], triangle.vertices[1]), Subtract(intersection, triangle.vertices[1]));
+	Vector3 c2 = Cross(Subtract(triangle.vertices[0], triangle.vertices[2]), Subtract(intersection, triangle.vertices[2]));
+
+	if (Dot(normal, c0) >= 0 && Dot(normal, c1) >= 0 && Dot(normal, c2) >= 0) {
+		return true; // 三角形内部
+	}
+
+	return false; // 外部
+}
+
+void DrawTriangle(
+	const Triangle& triangle,
+	const Matrix4x4& viewProjectionMatrix,
+	const Matrix4x4& viewportMatrix,
+	int color
+) {
+	// 各頂点をワールド → ビュー → プロジェクション → ビューポートへ変換
+	Vector3 p0 = Transform(Transform(triangle.vertices[0], viewProjectionMatrix), viewportMatrix);
+	Vector3 p1 = Transform(Transform(triangle.vertices[1], viewProjectionMatrix), viewportMatrix);
+	Vector3 p2 = Transform(Transform(triangle.vertices[2], viewProjectionMatrix), viewportMatrix);
+
+	// 三角形の辺を描画
+	Novice::DrawTriangle((int)p0.x, (int)p0.y, (int)p1.x, (int)p1.y, (int)p2.x, (int)p2.y, color, kFillModeWireFrame);
+
+
+}
+
 
 
 Vector3 Perpendicular(const Vector3& vector) {
