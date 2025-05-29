@@ -87,6 +87,7 @@ Vector3 Normalize(const Vector3& v);
 Vector3 Multiply(float scalar, const Vector3& v);
 bool IsCollision(const Sphere& s1, const Sphere& s2);
 bool IsCollision(const Sphere& sphere, const Plane& plane);
+bool IsCollision(const Segment& segment, const Plane& plane);
 Vector3 Perpendicular(const Vector3& vector);
 void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, int color);
 void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix);

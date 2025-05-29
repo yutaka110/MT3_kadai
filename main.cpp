@@ -147,11 +147,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	   Vector3 start = Transform(Transform(segment.origin, worldViewProjectionMatrix), viewportMatrix);
 	   Vector3 end = Transform(Transform(Add(segment.origin, segment.diff), worldViewProjectionMatrix), viewportMatrix);
 
-	  /* Novice::DrawLine(
-		   int(start.x), int(start.y),
-		   int(end.x), int(end.y),
-		   WHITE
-	   );*/
+	  
 
 	   //グリッドの描画
 	   //DrawGrid(worldViewProjectionMatrix, viewportMatrix);
@@ -168,6 +164,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	   DrawSphere(sphere, worldViewProjectionMatrix, viewportMatrix, WHITE);*/
 
+	   Novice::DrawLine(
+		   int(start.x), int(start.y),
+		   int(end.x), int(end.y),
+		   WHITE
+	   );
 
 	   //平面と球の当たり判定
        if (IsCollision(sphere, plane))
@@ -179,9 +180,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		   DrawSphere(sphere, worldViewProjectionMatrix, viewportMatrix, WHITE);
 	   }
 
+	   if (IsCollision(segment, plane))
+	   {
+		   DrawPlane(plane, worldViewProjectionMatrix, viewportMatrix, RED);
+		  
+	   }
+	   else
+	   {
+		   DrawPlane(plane, worldViewProjectionMatrix, viewportMatrix, WHITE);
+	   }
+
 	   //DrawSphere(sphere, worldViewProjectionMatrix, viewportMatrix, WHITE);
 
-	   DrawPlane(plane, worldViewProjectionMatrix, viewportMatrix, WHITE);
+	  
 
 		//// 描画
 		//Novice::DrawTriangle(

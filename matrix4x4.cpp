@@ -443,6 +443,30 @@ bool IsCollision(const Sphere& sphere, const Plane& plane) {
 	return std::abs(dist) <= sphere.radius;
 }
 
+bool IsCollision(const Segment& line, const Plane& plane) {
+	//方向ベクトル
+	Vector3 dir = line.diff;
+
+	//分母：平面法線と線の向きの内積
+	float dot = Dot(plane.normal, dir);
+
+	//平行な場合は交差しない
+	if (dot == 0.0f) {
+		return false;
+	}
+
+	//tを求める（上記数式に基づく）
+	float t = (plane.distance - Dot(line.origin, plane.normal)) / dot;
+
+	//線分外なら衝突していない
+	if (t < 0.0f || t > 1.0f) {
+		return false;
+	}
+
+	
+	return true;
+}
+
 
 Vector3 Perpendicular(const Vector3& vector) {
 	if (vector.x != 0.0f || vector.y != 0.0f) {
