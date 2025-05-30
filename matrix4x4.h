@@ -68,6 +68,7 @@ struct AABB
 	Vector3 max;
 };
 
+
 Matrix4x4 Add(Matrix4x4 m1, Matrix4x4 m2);
 Matrix4x4 Subtract(Matrix4x4 m1, Matrix4x4 m2);
 Matrix4x4 Multiply(Matrix4x4 m1, Matrix4x4 m2);
@@ -93,7 +94,7 @@ Vector3 Subtract(const Vector3& a, const Vector3& b);
 Vector3 Add(const Vector3& a, const Vector3& b);
 Vector3 Multiply(const Vector3& v, float scalar);
 float Dot(const Vector3& a, const Vector3& b);
-
+float Length(const Vector3& v);
 
 Vector3 Normalize(const Vector3& v);
 Vector3 Multiply(float scalar, const Vector3& v);
@@ -102,6 +103,7 @@ bool IsCollision(const Sphere& sphere, const Plane& plane);
 bool IsCollision(const Segment& segment, const Plane& plane);
 bool IsCollision(const Triangle& triangle, const Segment& segment);
 bool IsCollision(const AABB& aabb1, const AABB& aabb2);
+bool IsCollision(const AABB& aabb, const Sphere& sphere);
 Vector3 Perpendicular(const Vector3& vector);
 void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, int color);
 void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix);

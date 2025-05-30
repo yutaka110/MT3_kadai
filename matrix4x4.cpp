@@ -2,7 +2,7 @@
 #include <Novice.h>
 #include "matrix4x4.h"
 #include <cmath>
-
+#include<algorithm>
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
@@ -378,6 +378,11 @@ Vector3 Cross(const Vector3& v1, const Vector3& v2)
 	return result;
 }
 
+float Length(const Vector3& v) {
+	return std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+}
+
+
 //Vector3 Project(const Vector3& v1, const Vector3& v2)
 //{
 //	Vector3 result;
@@ -532,6 +537,31 @@ bool IsCollision(const AABB& aabb1, const AABB& aabb2)
 		return false;
 	}
 
+}
+
+bool IsCollision(const AABB& aabb, const Sphere& sphere)
+{
+	//最近接点を求める
+	Vector3 closestPoint
+	{
+		std::clamp(sphere.center.x,aabb.min.x,aabb.max.x),
+		std::clamp(sphere.center.y,aabb.min.y,aabb.max.y),
+		std::clamp(sphere.center.z,aabb.min.z,aabb.max.z),
+	};
+
+	//最近接点と球の中心との距離を求める
+	float distance = Length(closestPoint - sphere.center);
+
+	//距離が半径よりも小さければ衝突
+	if (distance <= sphere.radius)
+	{
+		//衝突
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, int color)
