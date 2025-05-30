@@ -207,7 +207,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	   DrawTriangle(triangle, worldViewProjectionMatrix, viewportMatrix, WHITE);*/
 
-	   //DrawSphere(sphere, worldViewProjectionMatrix, viewportMatrix, WHITE);
+	   DrawSphere(sphere, worldViewProjectionMatrix, viewportMatrix, WHITE);
 
 	   if (IsCollision(triangle, segment))
 	   {
@@ -227,7 +227,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	   }
 
 	   //AABBの描画
-	   if (IsCollision(aabb1, aabb2))
+	   /*if (IsCollision(aabb1, aabb2))
+	   {
+		   DrawAABB(aabb1, worldViewProjectionMatrix, viewportMatrix, RED);
+	   }
+	   else
+	   {
+		   DrawAABB(aabb1, worldViewProjectionMatrix, viewportMatrix, WHITE);
+	   }*/
+
+	  // DrawAABB(aabb2, worldViewProjectionMatrix, viewportMatrix, WHITE);
+
+	   //球とAABBの衝突判定
+	   if (IsCollision(aabb1, sphere))
 	   {
 		   DrawAABB(aabb1, worldViewProjectionMatrix, viewportMatrix, RED);
 	   }
@@ -235,8 +247,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	   {
 		   DrawAABB(aabb1, worldViewProjectionMatrix, viewportMatrix, WHITE);
 	   }
-
-	   DrawAABB(aabb2, worldViewProjectionMatrix, viewportMatrix, WHITE);
 
 		//// 描画
 		//Novice::DrawTriangle(
