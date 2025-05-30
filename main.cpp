@@ -60,6 +60,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	}
 	};
 
+	AABB aabb1
+	{
+		.min{-0.5f,-0.5f,-0.5f},
+		.max{0.0f,0.0f,0.0f},
+	};
+
+	AABB aabb2
+	{
+		.min{0.2f,0.2f,0.2f},
+		.max{1.0f,1.0f,1.0f},
+	};
 	
 	Matrix4x4 worldMatrix;
 	Matrix4x4 cameraMatrix;
@@ -173,17 +184,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	   
 
-	   //平面と球の当たり判定
-       if (IsCollision(sphere, plane))
-	   {
-		   DrawSphere(sphere, worldViewProjectionMatrix, viewportMatrix, RED);
-	   }
-	   else
-	   {
-		   DrawSphere(sphere, worldViewProjectionMatrix, viewportMatrix, WHITE);
-	   }
+	   ////平面と球の当たり判定
+    //   if (IsCollision(sphere, plane))
+	   //{
+		  // DrawSphere(sphere, worldViewProjectionMatrix, viewportMatrix, RED);
+	   //}
+	   //else
+	   //{
+		  // DrawSphere(sphere, worldViewProjectionMatrix, viewportMatrix, WHITE);
+	   //}
 
-	   if (IsCollision(segment, plane))
+	   //線と平面の当たり判定
+	  /* if (IsCollision(segment, plane))
 	   {
 		   DrawPlane(plane, worldViewProjectionMatrix, viewportMatrix, RED);
 		  
@@ -193,7 +205,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		   DrawPlane(plane, worldViewProjectionMatrix, viewportMatrix, WHITE);
 	   }
 
-	   DrawTriangle(triangle, worldViewProjectionMatrix, viewportMatrix, WHITE);
+	   DrawTriangle(triangle, worldViewProjectionMatrix, viewportMatrix, WHITE);*/
 
 	   //DrawSphere(sphere, worldViewProjectionMatrix, viewportMatrix, WHITE);
 
@@ -213,6 +225,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			   WHITE
 		   );
 	   }
+
+	   //AABBの描画
+	   if (IsCollision(aabb1, aabb2))
+	   {
+		   DrawAABB(aabb1, worldViewProjectionMatrix, viewportMatrix, RED);
+	   }
+	   else
+	   {
+		   DrawAABB(aabb1, worldViewProjectionMatrix, viewportMatrix, WHITE);
+	   }
+
+	   DrawAABB(aabb2, worldViewProjectionMatrix, viewportMatrix, WHITE);
 
 		//// 描画
 		//Novice::DrawTriangle(
@@ -239,6 +263,36 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		//正規化
 		plane.normal = Normalize(plane.normal); 
+
+		
+		ImGui::DragFloat3("AABB1 Min", &aabb1.min.x, 0.01f);
+		ImGui::DragFloat3("AABB1 Max", &aabb1.max.x, 0.01f);
+
+		ImGui::DragFloat3("AABB2 Min", &aabb2.min.x, 0.01f);
+		ImGui::DragFloat3("AABB2 Max", &aabb2.max.x, 0.01f);
+
+		// 最小値が最大値を超えないように制限
+		// x成分の修正
+		if (aabb1.min.x > aabb1.max.x) {
+			float temp = aabb1.min.x;
+			aabb1.min.x = aabb1.max.x;
+			aabb1.max.x = temp;
+		}
+
+		// y成分の修正
+		if (aabb1.min.y > aabb1.max.y) {
+			float temp = aabb1.min.y;
+			aabb1.min.y = aabb1.max.y;
+			aabb1.max.y = temp;
+		}
+
+		// z成分の修正
+		if (aabb1.min.z > aabb1.max.z) {
+			float temp = aabb1.min.z;
+			aabb1.min.z = aabb1.max.z;
+			aabb1.max.z = temp;
+		}
+
 
 		ImGui::End();
 		

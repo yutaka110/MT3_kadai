@@ -62,6 +62,12 @@ struct Triangle
 	Vector3 vertices[3];
 };
 
+struct AABB
+{
+	Vector3 min;
+	Vector3 max;
+};
+
 Matrix4x4 Add(Matrix4x4 m1, Matrix4x4 m2);
 Matrix4x4 Subtract(Matrix4x4 m1, Matrix4x4 m2);
 Matrix4x4 Multiply(Matrix4x4 m1, Matrix4x4 m2);
@@ -95,12 +101,13 @@ bool IsCollision(const Sphere& s1, const Sphere& s2);
 bool IsCollision(const Sphere& sphere, const Plane& plane);
 bool IsCollision(const Segment& segment, const Plane& plane);
 bool IsCollision(const Triangle& triangle, const Segment& segment);
+bool IsCollision(const AABB& aabb1, const AABB& aabb2);
 Vector3 Perpendicular(const Vector3& vector);
 void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, int color);
 void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix);
 void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, int color);
-void DrawTriangle(
-	const Triangle& triangle,const Matrix4x4& viewProjectionMatrix,const Matrix4x4& viewportMatrix,	int color);
+void DrawTriangle(const Triangle& triangle,const Matrix4x4& viewProjectionMatrix,const Matrix4x4& viewportMatrix,	int color);
+void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, int color);
 void VectorScreenPrintf(int x, int y, const Vector3 vector, const char* label);
 void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix);
 Vector3 Cross(const Vector3& v1, const Vector3& v2);

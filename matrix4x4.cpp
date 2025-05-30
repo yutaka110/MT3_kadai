@@ -510,6 +510,71 @@ bool IsCollision(const Triangle& triangle, const Segment& segment)
 	return false; // 外部
 }
 
+bool IsCollision(const AABB& aabb1, const AABB& aabb2)
+{
+	
+	if (
+		//x軸
+		(aabb1.min.x <= aabb2.max.x &&  aabb1.max.x >= aabb2.min.x) &&
+
+		//y軸
+		(aabb1.min.y <= aabb2.max.y &&  aabb1.max.y >= aabb2.min.y) &&
+
+		//z軸
+		(aabb1.min.z <= aabb2.max.z &&  aabb1.max.z >= aabb2.min.z)
+		)
+	{ 
+		//衝突
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+
+}
+
+void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, int color)
+{
+	Matrix4x4 vpvpMatrix = Multiply(viewProjectionMatrix, viewportMatrix);
+
+	// min = (xmin, ymin, zmin), max = (xmax, ymax, zmax)
+	Vector3 p0 = { aabb.min.x, aabb.min.y, aabb.min.z };
+	Vector3 p1 = { aabb.max.x, aabb.min.y, aabb.min.z };
+	Vector3 p2 = { aabb.min.x, aabb.max.y, aabb.min.z };
+	Vector3 p3 = { aabb.max.x, aabb.max.y, aabb.min.z };
+	Vector3 p4 = { aabb.min.x, aabb.min.y, aabb.max.z };
+	Vector3 p5 = { aabb.max.x, aabb.min.y, aabb.max.z };
+	Vector3 p6 = { aabb.min.x, aabb.max.y, aabb.max.z };
+	Vector3 p7 = { aabb.max.x, aabb.max.y, aabb.max.z };
+
+	p0 = Transform(p0, vpvpMatrix);
+	p1 = Transform(p1, vpvpMatrix);
+	p2 = Transform(p2, vpvpMatrix);
+	p3 = Transform(p3, vpvpMatrix);
+	p4 = Transform(p4, vpvpMatrix);
+	p5 = Transform(p5, vpvpMatrix);
+	p6 = Transform(p6, vpvpMatrix);
+	p7 = Transform(p7, vpvpMatrix);
+
+	Novice::DrawLine(static_cast<int>(p0.x), static_cast<int>(p0.y), static_cast<int>(p1.x), static_cast<int>(p1.y), color);
+	Novice::DrawLine(static_cast<int>(p1.x), static_cast<int>(p1.y), static_cast<int>(p3.x), static_cast<int>(p3.y), color);
+	Novice::DrawLine(static_cast<int>(p3.x), static_cast<int>(p3.y), static_cast<int>(p2.x), static_cast<int>(p2.y), color);
+	Novice::DrawLine(static_cast<int>(p2.x), static_cast<int>(p2.y), static_cast<int>(p0.x), static_cast<int>(p0.y), color);
+
+	Novice::DrawLine(static_cast<int>(p4.x), static_cast<int>(p4.y), static_cast<int>(p5.x), static_cast<int>(p5.y), color);
+	Novice::DrawLine(static_cast<int>(p5.x), static_cast<int>(p5.y), static_cast<int>(p7.x), static_cast<int>(p7.y), color);
+	Novice::DrawLine(static_cast<int>(p7.x), static_cast<int>(p7.y), static_cast<int>(p6.x), static_cast<int>(p6.y), color);
+	Novice::DrawLine(static_cast<int>(p6.x), static_cast<int>(p6.y), static_cast<int>(p4.x), static_cast<int>(p4.y), color);
+
+	Novice::DrawLine(static_cast<int>(p0.x), static_cast<int>(p0.y), static_cast<int>(p4.x), static_cast<int>(p4.y), color);
+	Novice::DrawLine(static_cast<int>(p1.x), static_cast<int>(p1.y), static_cast<int>(p5.x), static_cast<int>(p5.y), color);
+	Novice::DrawLine(static_cast<int>(p2.x), static_cast<int>(p2.y), static_cast<int>(p6.x), static_cast<int>(p6.y), color);
+	Novice::DrawLine(static_cast<int>(p3.x), static_cast<int>(p3.y), static_cast<int>(p7.x), static_cast<int>(p7.y), color);
+
+}
+
+
 void DrawTriangle(
 	const Triangle& triangle,
 	const Matrix4x4& viewProjectionMatrix,
