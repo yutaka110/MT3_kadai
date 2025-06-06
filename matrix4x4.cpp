@@ -564,6 +564,41 @@ bool IsCollision(const AABB& aabb, const Sphere& sphere)
 	}
 }
 
+bool IsCollision(const AABB& aabb, const Segment& segment)
+{
+	Vector3 rayOrigin = segment.origin;
+	Vector3 rayDir = segment.diff;
+
+	float tMin = 0.0f;  // 線分の開始点
+	float tMax = 1.0f;  // 線分の終点（長さ1のパラメータ）
+
+	// 各軸でのスラブとの交差
+	for (int i = 0; i < 3; ++i) {
+		float origin = (&rayOrigin.x)[i];
+		float direction = (&rayDir.x)[i];
+		float min = (&aabb.min.x)[i];
+		float max = (&aabb.max.x)[i];
+
+		if (fabsf(direction) < 1e-6f) {
+			// 線がこの軸方向に進んでいない場合、原点がスラブ内になければ衝突なし
+			if (origin < min || origin > max) return false;
+		}
+		else {
+			float t1 = (min - origin) / direction;
+			float t2 = (max - origin) / direction;
+
+			if (t1 > t2) std::swap(t1, t2);  // 近い側と遠い側を整理
+
+			tMin = (std::max)(tMin, t1);
+			tMax = (std::min)(tMax, t2);
+
+			if (tMin > tMax) return false;  // 共通範囲がない → 衝突なし
+		}
+	}
+
+	return true;  // 衝突している（t ∈ [0,1] の範囲に交点あり）
+}
+
 void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, int color)
 {
 	Matrix4x4 vpvpMatrix = Multiply(viewProjectionMatrix, viewportMatrix);
