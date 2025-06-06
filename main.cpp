@@ -209,7 +209,25 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	   DrawSphere(sphere, worldViewProjectionMatrix, viewportMatrix, WHITE);
 
-	   if (IsCollision(triangle, segment))
+	  /* if (IsCollision(triangle, segment))
+	   {
+		   Novice::DrawLine(
+			   int(start.x), int(start.y),
+			   int(end.x), int(end.y),
+			   RED
+		   );
+	   }
+	   else
+	   {
+		   Novice::DrawLine(
+			   int(start.x), int(start.y),
+			   int(end.x), int(end.y),
+			   WHITE
+		   );
+	   }*/
+
+	   //AABBと線分の衝突判定
+	   if (IsCollision(aabb1, segment))
 	   {
 		   Novice::DrawLine(
 			   int(start.x), int(start.y),
