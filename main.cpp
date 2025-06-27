@@ -71,7 +71,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		.min{0.2f,0.2f,0.2f},
 		.max{1.0f,1.0f,1.0f},
 	};
+
+	Vector3 controlPoints[3] = {
+		{-0.8f,0.58f,1.0f},
+		{1.76f,1.0f,-0.3f},
+		{0.94f,-0.7f,2.3f},
+	};
+
 	
+
 	Matrix4x4 worldMatrix;
 	Matrix4x4 cameraMatrix;
 	Matrix4x4 viewMatrix;
@@ -133,6 +141,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Sphere pointSphere{ point, 0.01f };        // 点の可視化用の球（赤）
 		Sphere closestPointSphere{ closestPoint, 0.01f }; // 最近接点の可視化用の球（黒）
 
+		Sphere controlPointsSphere[3];
+		controlPointsSphere[0] = { controlPoints[0],0.01f };
+		controlPointsSphere[1] = { controlPoints[1],0.01f };
+		controlPointsSphere[2] = { controlPoints[2],0.01f };
+
+		//Vector3 p0p1=Lerp
+
 	/*	DrawSphere(pointSphere, worldViewProjectionMatrix, viewportMatrix, RED);
 		DrawSphere(closestPointSphere, worldViewProjectionMatrix, viewportMatrix, BLACK);*/
 
@@ -164,11 +179,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	   Vector3 start = Transform(Transform(segment.origin, worldViewProjectionMatrix), viewportMatrix);
 	   Vector3 end = Transform(Transform(Add(segment.origin, segment.diff), worldViewProjectionMatrix), viewportMatrix);
-
+	  
 	  
 
 	   //グリッドの描画
-	   //DrawGrid(worldViewProjectionMatrix, viewportMatrix);
+	   DrawGrid(worldViewProjectionMatrix, viewportMatrix);
 
 	   //球と球の当たり判定
 	/*   if (IsCollision(sphere, sphere2))
@@ -207,7 +222,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	   DrawTriangle(triangle, worldViewProjectionMatrix, viewportMatrix, WHITE);*/
 
-	   DrawSphere(sphere, worldViewProjectionMatrix, viewportMatrix, WHITE);
+	   //DrawSphere(sphere, worldViewProjectionMatrix, viewportMatrix, WHITE);
 
 	  /* if (IsCollision(triangle, segment))
 	   {
@@ -227,7 +242,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	   }*/
 
 	   //AABBと線分の衝突判定
-	   if (IsCollision(aabb1, segment))
+	   /*if (IsCollision(aabb1, segment))
 	   {
 		   Novice::DrawLine(
 			   int(start.x), int(start.y),
@@ -242,7 +257,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			   int(end.x), int(end.y),
 			   WHITE
 		   );
-	   }
+	   }*/
 
 	   //AABBの描画
 	   /*if (IsCollision(aabb1, aabb2))
@@ -256,15 +271,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	  // DrawAABB(aabb2, worldViewProjectionMatrix, viewportMatrix, WHITE);
 
-	   //球とAABBの衝突判定
-	   if (IsCollision(aabb1, sphere))
-	   {
-		   DrawAABB(aabb1, worldViewProjectionMatrix, viewportMatrix, RED);
-	   }
-	   else
-	   {
-		   DrawAABB(aabb1, worldViewProjectionMatrix, viewportMatrix, WHITE);
-	   }
+	   ////球とAABBの衝突判定
+	   //if (IsCollision(aabb1, sphere))
+	   //{
+		  // DrawAABB(aabb1, worldViewProjectionMatrix, viewportMatrix, RED);
+	   //}
+	   //else
+	   //{
+		  // DrawAABB(aabb1, worldViewProjectionMatrix, viewportMatrix, WHITE);
+	   //}
 
 		//// 描画
 		//Novice::DrawTriangle(
@@ -273,6 +288,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//	int(screenVertices[2].x), int(screenVertices[2].y), RED, kFillModeSolid
 		//);
 
+	   DrawBezier(controlPoints[0], controlPoints[1], controlPoints[2], worldViewProjectionMatrix, viewportMatrix, WHITE);
+	   for (int i = 0; i < 3; ++i) {
+		   DrawSphere(controlPointsSphere[i], worldViewProjectionMatrix, viewportMatrix, WHITE);
+	   }
 		VectorScreenPrintf(0, 0, cross, "Cross");
 
 		ImGui::Begin("Window");
@@ -298,6 +317,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		ImGui::DragFloat3("AABB2 Min", &aabb2.min.x, 0.01f);
 		ImGui::DragFloat3("AABB2 Max", &aabb2.max.x, 0.01f);
+
+		ImGui::Text("Bezier Control Points");
+		ImGui::DragFloat3("ControlPoint0", &controlPoints[0].x, 0.01f);
+		ImGui::DragFloat3("ControlPoint1", &controlPoints[1].x, 0.01f);
+		ImGui::DragFloat3("ControlPoint2", &controlPoints[2].x, 0.01f);
+
 
 		// 最小値が最大値を超えないように制限
 		// x成分の修正
