@@ -438,6 +438,44 @@ float Dot(const Vector3& a, const Vector3& b) {
 	return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
+Vector3 Lerp(const Vector3& v1, const Vector3& v2, float t)
+{
+	return {
+		v1.x + (v2.x - v1.x) * t,
+		v1.y + (v2.y - v1.y) * t,
+		v1.z + (v2.z - v1.z) * t
+	};
+}
+
+void DrawBezier(const Vector3& controlPoint0, const Vector3& controlPoint1, const Vector3& controlPoint2,
+	const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, int color)
+{
+	const int divisions = 32; // 曲線を分割する数
+	Matrix4x4 vpvpMatrix = Multiply(viewProjectionMatrix, viewportMatrix);
+
+	Vector3 prev = controlPoint0;
+
+	for (int i = 1; i <= divisions; ++i)
+	{
+		float t = static_cast<float>(i) / divisions;
+
+		// 2次ベジェ曲線の式: B(t) = Lerp(Lerp(P0,P1,t), Lerp(P1,P2,t), t)
+		Vector3 a = Lerp(controlPoint0, controlPoint1, t);
+		Vector3 b = Lerp(controlPoint1, controlPoint2, t);
+		Vector3 point = Lerp(a, b, t);
+
+		// スクリーン座標へ変換
+		Vector3 screenPrev = Transform(prev, vpvpMatrix);
+		Vector3 screenNow = Transform(point, vpvpMatrix);
+
+		// 線分描画
+		Novice::DrawLine(static_cast<int>(screenPrev.x), static_cast<int>(screenPrev.y),
+			static_cast<int>(screenNow.x), static_cast<int>(screenNow.y),
+			color);
+
+		prev = point;
+	}
+}
 
 bool IsCollision(const Sphere& s1, const Sphere& s2) {
 	Vector3 diff = s1.center - s2.center;

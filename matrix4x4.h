@@ -98,6 +98,9 @@ float Length(const Vector3& v);
 
 Vector3 Normalize(const Vector3& v);
 Vector3 Multiply(float scalar, const Vector3& v);
+Vector3 Lerp(const Vector3& v1, const Vector3& v2, float t);
+void DrawBezier(const Vector3& controlPoint0, const Vector3& controlPoint1, const Vector3& controlPoint2,
+	const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, int color);
 bool IsCollision(const Sphere& s1, const Sphere& s2);
 bool IsCollision(const Sphere& sphere, const Plane& plane);
 bool IsCollision(const Segment& segment, const Plane& plane);
