@@ -78,6 +78,24 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		{0.94f,-0.7f,2.3f},
 	};
 
+	Vector3 translates[3] = {
+	{0.2f, 1.0f, 0.0f},
+	{0.4f, 0.0f, 0.0f},
+	{0.3f, 0.0f, 0.0f},
+	};
+
+	Vector3 rotates[3] = {
+		{0.0f, 0.0f, -6.8f},
+		{0.0f, 0.0f, -1.4f},
+		{0.0f, 0.0f, 0.0f},
+	};
+
+	Vector3 scales[3] = {
+		{1.0f, 1.0f, 1.0f},
+		{1.0f, 1.0f, 1.0f},
+		{1.0f, 1.0f, 1.0f},
+	};
+
 	
 
 	Matrix4x4 worldMatrix;
@@ -88,6 +106,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Matrix4x4 viewportMatrix;
 
 	
+
 
 	
 	// ウィンドウの×ボタンが押されるまでループ
@@ -146,6 +165,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		controlPointsSphere[1] = { controlPoints[1],0.01f };
 		controlPointsSphere[2] = { controlPoints[2],0.01f };
 
+		Matrix4x4 shoulderMatrix = MakeAffineMatrix(scales[0], rotates[0], translates[0]);
+		Matrix4x4 elbowMatrixLocal = MakeAffineMatrix(scales[1], rotates[1], translates[1]);
+		Matrix4x4 handMatrixLocal = MakeAffineMatrix(scales[2], rotates[2], translates[2]);
+
+		// 肘は肩に親子付け（肩→肘）
+		Matrix4x4 elbowMatrix = Multiply(elbowMatrixLocal, shoulderMatrix);
+		// 手は肘に親子付け（肩→肘→手）
+		Matrix4x4 handMatrix = Multiply(handMatrixLocal, elbowMatrix);
+
+		Vector3 shoulderWorldPos = Transform({ 0, 0, 0 }, shoulderMatrix);
+		Vector3 elbowWorldPos = Transform({ 0, 0, 0 }, elbowMatrix);
+		Vector3 handWorldPos = Transform({ 0, 0, 0 }, handMatrix);
+
+
 		//Vector3 p0p1=Lerp
 
 	/*	DrawSphere(pointSphere, worldViewProjectionMatrix, viewportMatrix, RED);
@@ -184,6 +217,27 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	   //グリッドの描画
 	   DrawGrid(worldViewProjectionMatrix, viewportMatrix);
+
+	   Vector3 shoulderScreen = Transform(shoulderWorldPos, worldViewProjectionMatrix);
+	   shoulderScreen = Transform(shoulderScreen, viewportMatrix);
+
+	   Vector3 elbowScreen = Transform(elbowWorldPos, worldViewProjectionMatrix);
+	   elbowScreen = Transform(elbowScreen, viewportMatrix);
+
+	   Vector3 handScreen = Transform(handWorldPos, worldViewProjectionMatrix);
+	   handScreen = Transform(handScreen, viewportMatrix);
+
+	   // 球の描画（肩：赤、肘：緑、手：青）
+	   DrawSphere({ shoulderWorldPos, 0.05f }, worldViewProjectionMatrix, viewportMatrix, RED);
+	   DrawSphere({ elbowWorldPos, 0.05f }, worldViewProjectionMatrix, viewportMatrix, GREEN);
+	   DrawSphere({ handWorldPos, 0.05f }, worldViewProjectionMatrix, viewportMatrix, BLUE);
+
+	   // 関節をつなぐ線の描画
+	   Novice::DrawLine((int)shoulderScreen.x, (int)shoulderScreen.y,
+		   (int)elbowScreen.x, (int)elbowScreen.y, WHITE);
+	   Novice::DrawLine((int)elbowScreen.x, (int)elbowScreen.y,
+		   (int)handScreen.x, (int)handScreen.y, WHITE);
+
 
 	   //球と球の当たり判定
 	/*   if (IsCollision(sphere, sphere2))
@@ -322,6 +376,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::DragFloat3("ControlPoint0", &controlPoints[0].x, 0.01f);
 		ImGui::DragFloat3("ControlPoint1", &controlPoints[1].x, 0.01f);
 		ImGui::DragFloat3("ControlPoint2", &controlPoints[2].x, 0.01f);
+
+		ImGui::Separator();
+		ImGui::Text("Joint Transforms");
+
+		// 0: 肩, 1: 肘, 2: 手
+		ImGui::DragFloat3("Translate 0", &translates[0].x, 0.01f);
+		ImGui::DragFloat3("Rotate 0", &rotates[0].x, 0.01f);
+		ImGui::DragFloat3("Scale 0", &scales[0].x, 0.01f);
+
+		ImGui::DragFloat3("Translate 1", &translates[1].x, 0.01f);
+		ImGui::DragFloat3("Rotate 1", &rotates[1].x, 0.01f);
+		ImGui::DragFloat3("Scale 1", &scales[1].x, 0.01f);
+
+		ImGui::DragFloat3("Translate 2", &translates[2].x, 0.01f);
+		ImGui::DragFloat3("Rotate 2", &rotates[2].x, 0.01f);
+		ImGui::DragFloat3("Scale 2", &scales[2].x, 0.01f);
+
 
 
 		// 最小値が最大値を超えないように制限
