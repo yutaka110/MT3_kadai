@@ -169,9 +169,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Matrix4x4 elbowMatrixLocal = MakeAffineMatrix(scales[1], rotates[1], translates[1]);
 		Matrix4x4 handMatrixLocal = MakeAffineMatrix(scales[2], rotates[2], translates[2]);
 
-		// 肘は肩に親子付け（肩→肘）
+		// 肘は肩に親子付け(肩→肘)
 		Matrix4x4 elbowMatrix = Multiply(elbowMatrixLocal, shoulderMatrix);
-		// 手は肘に親子付け（肩→肘→手）
+		// 手は肘に親子付け(肩→肘→手）
 		Matrix4x4 handMatrix = Multiply(handMatrixLocal, elbowMatrix);
 
 		Vector3 shoulderWorldPos = Transform({ 0, 0, 0 }, shoulderMatrix);
@@ -380,7 +380,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::Separator();
 		ImGui::Text("Joint Transforms");
 
-		// 0: 肩, 1: 肘, 2: 手
+		//0:肩,1:肘,2:手
 		ImGui::DragFloat3("Translate 0", &translates[0].x, 0.01f);
 		ImGui::DragFloat3("Rotate 0", &rotates[0].x, 0.01f);
 		ImGui::DragFloat3("Scale 0", &scales[0].x, 0.01f);
