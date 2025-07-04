@@ -19,7 +19,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	const int kWindowWidth = 1280;
 	const int kWindowHeight = 720;
 
-	Vector3 rotate{ 0.0f,2.0f,0.0f };
+	//Vector3 rotate{ 0.0f,2.0f,0.0f };
 	Vector3 translate{};
 
 	// カメラの位置（Z軸マイナス方向に引いている）
@@ -96,7 +96,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		{1.0f, 1.0f, 1.0f},
 	};
 
-	
+	Vector3 a{ 0.2f, 1.0f, 0.0f };
+	Vector3 b{ 2.4f, 3.1f, 1.2f };
+	Vector3 c = a + b;
+	Vector3 d = a - b;
+	Vector3 e = b * 2.4f;
+	Vector3 rotate{ 0.4f, 1.43f, -0.8f };
+
+	Matrix4x4 rotateXMatrix = MakeRoateXMatrix(rotate.x);
+	Matrix4x4 rotateYMatrix = MakeRoateYMatrix(rotate.y);
+	Matrix4x4 rotateZMatrix = MakeRoateZMatrix(rotate.z);
+	Matrix4x4 rotateMatrix = rotateXMatrix * rotateYMatrix * rotateZMatrix;
+
 
 	Matrix4x4 worldMatrix;
 	Matrix4x4 cameraMatrix;
@@ -393,6 +404,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::DragFloat3("Rotate 2", &rotates[2].x, 0.01f);
 		ImGui::DragFloat3("Scale 2", &scales[2].x, 0.01f);
 
+		ImGui::Text("c:%f, %f, %f", c.x, c.y, c.z);
+		ImGui::Text("d:%f, %f, %f", d.x, d.y, d.z);
+		ImGui::Text("e:%f, %f, %f", e.x, e.y, e.z);
+
+		ImGui::Text(
+			"matrix:\n%f, %f, %f, %f\n%f, %f, %f, %f\n%f, %f, %f, %f\n%f, %f, %f, %f\n",
+			rotateMatrix.m[0][0], rotateMatrix.m[0][1], rotateMatrix.m[0][2], rotateMatrix.m[0][3],
+			rotateMatrix.m[1][0], rotateMatrix.m[1][1], rotateMatrix.m[1][2], rotateMatrix.m[1][3],
+			rotateMatrix.m[2][0], rotateMatrix.m[2][1], rotateMatrix.m[2][2], rotateMatrix.m[2][3],
+			rotateMatrix.m[3][0], rotateMatrix.m[3][1], rotateMatrix.m[3][2], rotateMatrix.m[3][3]
+		);
 
 
 		// 最小値が最大値を超えないように制限

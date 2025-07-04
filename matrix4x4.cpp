@@ -29,6 +29,23 @@ Matrix4x4 Subtract(Matrix4x4 m1, Matrix4x4 m2)
 	return result;
 }
 
+Matrix4x4 operator*(const Matrix4x4& lhs, const Matrix4x4& rhs) {
+	Matrix4x4 result = {};
+
+	for (int row = 0; row < 4; ++row) {
+		for (int col = 0; col < 4; ++col) {
+			result.m[row][col] =
+				lhs.m[row][0] * rhs.m[0][col] +
+				lhs.m[row][1] * rhs.m[1][col] +
+				lhs.m[row][2] * rhs.m[2][col] +
+				lhs.m[row][3] * rhs.m[3][col];
+		}
+	}
+
+	return result;
+}
+
+
 Matrix4x4 Multiply(Matrix4x4 m1, Matrix4x4 m2)
 {
 	Matrix4x4 result;
