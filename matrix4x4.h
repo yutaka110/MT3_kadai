@@ -2,6 +2,8 @@
 struct Matrix4x4
 {
 	float m[4][4];
+	
+
 };
 
 struct Vector3
@@ -68,7 +70,7 @@ struct AABB
 	Vector3 max;
 };
 
-
+Matrix4x4 operator*(const Matrix4x4& lhs, const Matrix4x4& rhs);
 Matrix4x4 Add(Matrix4x4 m1, Matrix4x4 m2);
 Matrix4x4 Subtract(Matrix4x4 m1, Matrix4x4 m2);
 Matrix4x4 Multiply(Matrix4x4 m1, Matrix4x4 m2);
