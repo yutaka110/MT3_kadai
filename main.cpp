@@ -3,6 +3,9 @@
 #include"matrix4x4.h"
 #include <imgui.h>
 #include"Spring.h"
+#include<math.h>
+#define _USE_MATH_DEFINES
+#include <cmath>
 const char kWindowTitle[] = "LE2B_17_タケイ_ユタカ_タイトル";
 
 // Windowsアプリでのエントリーポイント(main関数)
@@ -107,6 +110,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	ball.mass = 2.0f;
 	ball.radius = 0.05f;
 	ball.color = BLUE;
+
+	float angularVelocity = 3.14f;
+	float angle = 0.0f;
+	float radius = 0.8f;
+
+	//円の中心
+	Vector3 center = { 0.0f, 0.0f, 0.0f };
+
+	//現在の位置(後で更新)
+	Vector3 position = {};  
 
 
 	Vector3 a{ 0.2f, 1.0f, 0.0f };
@@ -227,6 +240,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		
 
+		// 角度更新（角速度 × Δt）
+		angle += angularVelocity * deltaTime;
+
+		// 位置更新（2D円運動: XY平面）
+		position.x = center.x + std::cos(angle) * radius;
+		position.y = center.y + std::sin(angle) * radius;
+		position.z = center.z;
 
 		//Vector3 p0p1=Lerp
 
@@ -246,6 +266,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	   Vector3 anchorScreen = Transform(Transform(spring.anchor, worldViewProjectionMatrix), viewportMatrix);
 	   Vector3 ballScreen = Transform(Transform(ball.position, worldViewProjectionMatrix), viewportMatrix);
 
+	   Vector3 screenCenter = Transform(Transform(center, worldViewProjectionMatrix), viewportMatrix);
+	   Vector3 screenPos = Transform(Transform(position, worldViewProjectionMatrix), viewportMatrix);
+
+	   
 
 		/*Vector3 screenVertices[3];
 		for (uint32_t i = 0; i < 3; ++i) {
@@ -299,6 +323,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	   );
 
 	   DrawSphere({ ball.position, 0.05f }, worldViewProjectionMatrix, viewportMatrix, BLUE);
+
+	   Novice::DrawLine(
+		   static_cast<int>(screenCenter.x), static_cast<int>(screenCenter.y),
+		   static_cast<int>(screenPos.x), static_cast<int>(screenPos.y),
+		   RED
+	   );
+
+	 
 
 	   //球と球の当たり判定
 	/*   if (IsCollision(sphere, sphere2))
