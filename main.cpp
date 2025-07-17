@@ -2,7 +2,7 @@
 #include<cstdint>
 #include"matrix4x4.h"
 #include <imgui.h>
-
+#include"Spring.h"
 const char kWindowTitle[] = "LE2B_17_タケイ_ユタカ_タイトル";
 
 // Windowsアプリでのエントリーポイント(main関数)
@@ -96,6 +96,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		{1.0f, 1.0f, 1.0f},
 	};
 
+	Spring spring{};
+	spring.anchor = { 0.0f, 0.0f, 0.0f };
+	spring.naturalLength = 1.0f;
+	spring.stiffness = 100.0f;
+	spring.dampingCoefficient = 2.0f;
+
+	Ball ball{};
+	ball.position = { 1.2f, 0.0f, 0.0f };
+	ball.mass = 2.0f;
+	ball.radius = 0.05f;
+	ball.color = BLUE;
+
+
 	Vector3 a{ 0.2f, 1.0f, 0.0f };
 	Vector3 b{ 2.4f, 3.1f, 1.2f };
 	Vector3 c = a + b;
@@ -116,7 +129,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Matrix4x4 worldViewProjectionMatrix;
 	Matrix4x4 viewportMatrix;
 
+	//デルタタイム
+	float deltaTime = 1.0f / 60.0f;
 	
+
 
 
 	
@@ -189,6 +205,28 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Vector3 elbowWorldPos = Transform({ 0, 0, 0 }, elbowMatrix);
 		Vector3 handWorldPos = Transform({ 0, 0, 0 }, handMatrix);
 
+		Vector3 diff = ball.position - spring.anchor;
+		float length = Length(diff);
+		if (length != 0.0f) {
+			Vector3 direction = Normalize(diff);
+			Vector3 restPosition = spring.anchor + direction * spring.naturalLength;
+			Vector3 displacement = length * (ball.position - restPosition);
+			Vector3 restoringForce = -spring.stiffness * displacement;
+			Vector3 dampingForce = -spring.dampingCoefficient * ball.velocity;
+			Vector3 force = restoringForce + dampingForce;
+			ball.acceleration = force / ball.mass;
+			
+
+
+		}
+
+		// 加速度や速度もどちらも秒を基準とした値である
+		// それが 1/60秒間 (deltaTime) 適用されたと考える
+		ball.velocity += ball.acceleration * deltaTime;
+		ball.position += ball.velocity * deltaTime;
+
+		
+
 
 		//Vector3 p0p1=Lerp
 
@@ -204,7 +242,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	   worldViewProjectionMatrix = Multiply(Multiply(worldMatrix, viewMatrix), projectionMatrix);
 	   viewportMatrix = MakeViewportMatrix(0, 0, float(kWindowWidth), float(kWindowHeight), 0.0f, 1.0f);
 
-	  
+	   // anchor → ball.position を線で結ぶ（ばね表示）
+	   Vector3 anchorScreen = Transform(Transform(spring.anchor, worldViewProjectionMatrix), viewportMatrix);
+	   Vector3 ballScreen = Transform(Transform(ball.position, worldViewProjectionMatrix), viewportMatrix);
+
+
 		/*Vector3 screenVertices[3];
 		for (uint32_t i = 0; i < 3; ++i) {
 			Vector3 ndcVertex = Transform(kLocalVertices[i], worldViewProjectionMatrix);
@@ -249,6 +291,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	   Novice::DrawLine((int)elbowScreen.x, (int)elbowScreen.y,
 		   (int)handScreen.x, (int)handScreen.y, WHITE);
 
+
+	   Novice::DrawLine(
+		   static_cast<int>(anchorScreen.x), static_cast<int>(anchorScreen.y),
+		   static_cast<int>(ballScreen.x), static_cast<int>(ballScreen.y),
+		   BLACK
+	   );
+
+	   DrawSphere({ ball.position, 0.05f }, worldViewProjectionMatrix, viewportMatrix, BLUE);
 
 	   //球と球の当たり判定
 	/*   if (IsCollision(sphere, sphere2))
@@ -416,6 +466,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			rotateMatrix.m[3][0], rotateMatrix.m[3][1], rotateMatrix.m[3][2], rotateMatrix.m[3][3]
 		);
 
+		ImGui::Text("SPring");
+		ImGui::DragFloat("Natural Length", &spring.naturalLength, 0.01f, 0.0f);
+		ImGui::DragFloat("Stiffness", &spring.stiffness, 0.1f, 0.0f);
+		ImGui::DragFloat("Damping", &spring.dampingCoefficient, 0.1f, 0.0f);
+		if (ImGui::Button("Reset")) {
+			// Spring側は必要ならリセット
+			spring.anchor = { 0.0f, 0.0f, 0.0f };
+			
+
+			// Ballの状態リセット
+			ball.position = { 1.2f, 0.0f, 0.0f };
+			ball.velocity = { 0.0f, 0.0f, 0.0f };
+			ball.acceleration = { 0.0f, 0.0f, 0.0f };
+			ball.mass = 2.0f;
+			ball.radius = 0.05f;
+		}
 
 		// 最小値が最大値を超えないように制限
 		// x成分の修正

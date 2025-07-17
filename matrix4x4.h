@@ -12,7 +12,7 @@ struct Vector3
 	float y;
 	float z;
 
-	Vector3 operator-(const Vector3& rhs) const {
+	/*Vector3 operator-(const Vector3& rhs) const {
 		return { x - rhs.x, y - rhs.y, z - rhs.z };
 	}
 
@@ -22,11 +22,12 @@ struct Vector3
 
 	Vector3 operator*(float scalar) const {
 		return { x * scalar, y * scalar, z * scalar };
-	}
+	}*/
 
 	float Dot(const Vector3& rhs) const {
 		return x * rhs.x + y * rhs.y + z * rhs.z;
 	}
+
 };
 
 struct Sphere
@@ -69,6 +70,44 @@ struct AABB
 	Vector3 min;
 	Vector3 max;
 };
+
+// 構造体の外に書く！
+inline Vector3 operator+(const Vector3& lhs, const Vector3& rhs) {
+	return { lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z };
+}
+
+inline Vector3 operator-(const Vector3& lhs, const Vector3& rhs) {
+	return { lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z };
+}
+
+inline Vector3 operator*(const Vector3& v, float s) {
+	return { v.x * s, v.y * s, v.z * s };
+}
+
+
+inline Vector3 operator/(const Vector3& v, float s) {
+	return { v.x / s, v.y / s, v.z / s };
+}
+
+inline Vector3 operator-(const Vector3& v) {
+	return { -v.x, -v.y, -v.z };
+}
+
+inline Vector3& operator+=(Vector3& lhs, const Vector3& rhs) {
+	lhs.x += rhs.x;
+	lhs.y += rhs.y;
+	lhs.z += rhs.z;
+	return lhs;
+}
+
+
+
+// float * Vector3（今回追加する必要あり）
+inline Vector3 operator*(float s, const Vector3& v) {
+	return v * s; // 上の関数を呼び出し
+}
+
+
 
 Matrix4x4 operator*(const Matrix4x4& lhs, const Matrix4x4& rhs);
 Matrix4x4 Add(Matrix4x4 m1, Matrix4x4 m2);
