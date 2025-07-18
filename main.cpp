@@ -6,6 +6,7 @@
 #include<math.h>
 #define _USE_MATH_DEFINES
 #include <cmath>
+#include"Pendulum.h"
 const char kWindowTitle[] = "LE2B_17_タケイ_ユタカ_タイトル";
 
 // Windowsアプリでのエントリーポイント(main関数)
@@ -27,7 +28,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	// カメラの位置（Z軸マイナス方向に引いている）
 	Vector3 cameraPosition{ 0.0f, 0.0f, -5.0f };
-	Vector3 cameraTranslate{ 0.0f, 0.5f, 0.0f };
+	Vector3 cameraTranslate{ 0.0f, 0.0f, 0.0f };
 	Vector3 cameraRotate{ -0.2f,0.0f,0.0f };
 
 	// ローカル座標系の三角形の3頂点
@@ -120,6 +121,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	//現在の位置(後で更新)
 	Vector3 position = {};  
+
+	Pendulum pendulum;
+
+	pendulum.anchor = { 0.0f, 1.0f, 0.0f };
+	pendulum.length = 0.8f;
+	pendulum.angle = 0.7f;
+	pendulum.angularVelocity = 0.0f;
+	pendulum.angularAcceleration = 0.0f;
+
+	Vector3 pendulumTip = { 0.0f, 0.0f, 0.0f };
+	bool isPendulumActive = false;
 
 
 	Vector3 a{ 0.2f, 1.0f, 0.0f };
@@ -248,6 +260,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		position.y = center.y + std::sin(angle) * radius;
 		position.z = center.z;
 
+		if (isPendulumActive) {
+			pendulum.angularAcceleration =
+				-(9.8f / pendulum.length) * std::sin(pendulum.angle);
+
+			pendulum.angularVelocity += pendulum.angularAcceleration * deltaTime;
+			pendulum.angle += pendulum.angularVelocity * deltaTime;
+
+			// pは振り子の先端の位置。取り付けたいものを取り付ければ良い
+			pendulumTip.x = pendulum.anchor.x + std::sin(pendulum.angle) * pendulum.length;
+			pendulumTip.y = pendulum.anchor.y - std::cos(pendulum.angle) * pendulum.length;
+			pendulumTip.z = pendulum.anchor.z;
+		}
+
+
 		//Vector3 p0p1=Lerp
 
 	/*	DrawSphere(pointSphere, worldViewProjectionMatrix, viewportMatrix, RED);
@@ -269,8 +295,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	   Vector3 screenCenter = Transform(Transform(center, worldViewProjectionMatrix), viewportMatrix);
 	   Vector3 screenPos = Transform(Transform(position, worldViewProjectionMatrix), viewportMatrix);
 
-	   
-
+	   Vector3 screenPendulumAnchor= Transform(Transform(pendulum.anchor, worldViewProjectionMatrix), viewportMatrix);
+	   Vector3 screenPendulumTip = Transform(Transform(pendulumTip, worldViewProjectionMatrix), viewportMatrix);
 		/*Vector3 screenVertices[3];
 		for (uint32_t i = 0; i < 3; ++i) {
 			Vector3 ndcVertex = Transform(kLocalVertices[i], worldViewProjectionMatrix);
@@ -315,22 +341,30 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	   Novice::DrawLine((int)elbowScreen.x, (int)elbowScreen.y,
 		   (int)handScreen.x, (int)handScreen.y, WHITE);
 
+	   ////バネの線分描画
+	   //Novice::DrawLine(
+		  // static_cast<int>(anchorScreen.x), static_cast<int>(anchorScreen.y),
+		  // static_cast<int>(ballScreen.x), static_cast<int>(ballScreen.y),
+		  // BLACK
+	   //);
 
+	   ////バネの球描画
+	   //DrawSphere({ ball.position, 0.05f }, worldViewProjectionMatrix, viewportMatrix, BLUE);
+
+	   ////円運動線分描画
+	   //Novice::DrawLine(
+		  // static_cast<int>(screenCenter.x), static_cast<int>(screenCenter.y),
+		  // static_cast<int>(screenPos.x), static_cast<int>(screenPos.y),
+		  // RED
+	   //);
+
+	   //振り子の線分描画
 	   Novice::DrawLine(
-		   static_cast<int>(anchorScreen.x), static_cast<int>(anchorScreen.y),
-		   static_cast<int>(ballScreen.x), static_cast<int>(ballScreen.y),
-		   BLACK
-	   );
-
-	   DrawSphere({ ball.position, 0.05f }, worldViewProjectionMatrix, viewportMatrix, BLUE);
-
-	   Novice::DrawLine(
-		   static_cast<int>(screenCenter.x), static_cast<int>(screenCenter.y),
-		   static_cast<int>(screenPos.x), static_cast<int>(screenPos.y),
+		   static_cast<int>(screenPendulumAnchor.x), static_cast<int>(screenPendulumAnchor.y),
+		   static_cast<int>(screenPendulumTip.x), static_cast<int>(screenPendulumTip.y),
 		   RED
 	   );
-
-	 
+	   DrawSphere({ pendulumTip,0.05f }, worldViewProjectionMatrix, viewportMatrix, GREEN);
 
 	   //球と球の当たり判定
 	/*   if (IsCollision(sphere, sphere2))
@@ -498,6 +532,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			rotateMatrix.m[3][0], rotateMatrix.m[3][1], rotateMatrix.m[3][2], rotateMatrix.m[3][3]
 		);
 
+		//spring
 		ImGui::Text("SPring");
 		ImGui::DragFloat("Natural Length", &spring.naturalLength, 0.01f, 0.0f);
 		ImGui::DragFloat("Stiffness", &spring.stiffness, 0.1f, 0.0f);
@@ -513,6 +548,27 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			ball.acceleration = { 0.0f, 0.0f, 0.0f };
 			ball.mass = 2.0f;
 			ball.radius = 0.05f;
+		}
+
+		//pendulum
+		ImGui::Text("Pendulum");
+		if (ImGui::Button("Start Pendulum")) {
+			isPendulumActive = true;
+		}
+
+		if (ImGui::Button("Stop Pendulum")) {
+			isPendulumActive = false;
+		}
+
+		if (ImGui::Button("Reset Pendulum")) {
+			isPendulumActive = false;
+			pendulum.angle = 0.7f;
+			pendulum.angularVelocity = 0.0f;
+			pendulum.angularAcceleration = 0.0f;
+
+			pendulumTip.x = pendulum.anchor.x + std::sin(pendulum.angle) * pendulum.length;
+			pendulumTip.y = pendulum.anchor.y - std::cos(pendulum.angle) * pendulum.length;
+			pendulumTip.z = pendulum.anchor.z;
 		}
 
 		// 最小値が最大値を超えないように制限

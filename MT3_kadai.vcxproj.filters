@@ -113,5 +113,6 @@
     </ClInclude>
     <ClInclude Include="matrix4x4.h" />
     <ClInclude Include="Spring.h" />
+    <ClInclude Include="Pendulum.h" />
   </ItemGroup>
 </Project>
