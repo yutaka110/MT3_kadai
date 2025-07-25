@@ -131,8 +131,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	pendulum.angularAcceleration = 0.0f;
 
 	Vector3 pendulumTip = { 0.0f, 0.0f, 0.0f };
-	bool isPendulumActive = false;
+	bool isRunningPendulum = false;
 
+	//円錐振り子の定義
+	ConicalPendulum conicalPendulum;
+
+	conicalPendulum.anchor = { 0.0f, 1.0f, 0.0f };
+	conicalPendulum.length = 0.8f;
+	conicalPendulum.halfApexAngle = 0.7f;
+	conicalPendulum.angle = 0.0f;
+	conicalPendulum.angularVelocity = 0.0f;
+
+	Vector3 conicalPendulumBob = { 0.0f,0.0f,0.0f };
+	
+	//円錐振り子の実行フラグ
+	bool isRunningConicalPendulum = false;
 
 	Vector3 a{ 0.2f, 1.0f, 0.0f };
 	Vector3 b{ 2.4f, 3.1f, 1.2f };
@@ -230,25 +243,26 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Vector3 elbowWorldPos = Transform({ 0, 0, 0 }, elbowMatrix);
 		Vector3 handWorldPos = Transform({ 0, 0, 0 }, handMatrix);
 
-		Vector3 diff = ball.position - spring.anchor;
-		float length = Length(diff);
-		if (length != 0.0f) {
-			Vector3 direction = Normalize(diff);
-			Vector3 restPosition = spring.anchor + direction * spring.naturalLength;
-			Vector3 displacement = length * (ball.position - restPosition);
-			Vector3 restoringForce = -spring.stiffness * displacement;
-			Vector3 dampingForce = -spring.dampingCoefficient * ball.velocity;
-			Vector3 force = restoringForce + dampingForce;
-			ball.acceleration = force / ball.mass;
-			
+		//バネの更新
+		//Vector3 diff = ball.position - spring.anchor;
+		//float length = Length(diff);
+		//if (length != 0.0f) {
+		//	Vector3 direction = Normalize(diff);
+		//	Vector3 restPosition = spring.anchor + direction * spring.naturalLength;
+		//	Vector3 displacement = length * (ball.position - restPosition);
+		//	Vector3 restoringForce = -spring.stiffness * displacement;
+		//	Vector3 dampingForce = -spring.dampingCoefficient * ball.velocity;
+		//	Vector3 force = restoringForce + dampingForce;
+		//	ball.acceleration = force / ball.mass;
+		//	
 
 
-		}
+		//}
 
-		// 加速度や速度もどちらも秒を基準とした値である
-		// それが 1/60秒間 (deltaTime) 適用されたと考える
-		ball.velocity += ball.acceleration * deltaTime;
-		ball.position += ball.velocity * deltaTime;
+		//// 加速度や速度もどちらも秒を基準とした値である
+		//// それが 1/60秒間 (deltaTime) 適用されたと考える
+		//ball.velocity += ball.acceleration * deltaTime;
+		//ball.position += ball.velocity * deltaTime;
 
 		
 
@@ -260,7 +274,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		position.y = center.y + std::sin(angle) * radius;
 		position.z = center.z;
 
-		if (isPendulumActive) {
+		if (isRunningPendulum) {
 			pendulum.angularAcceleration =
 				-(9.8f / pendulum.length) * std::sin(pendulum.angle);
 
@@ -273,6 +287,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			pendulumTip.z = pendulum.anchor.z;
 		}
 
+		//**********************
+		// 円錐振り子の更新処理
+		//**********************
+		if (isRunningConicalPendulum) {
+			conicalPendulum.angularVelocity = std::sqrt(9.8f / (conicalPendulum.length * std::cos(conicalPendulum.halfApexAngle)));
+			conicalPendulum.angle += conicalPendulum.angularVelocity * deltaTime;
+
+			float conicalRadius = std::sin(conicalPendulum.halfApexAngle) * conicalPendulum.length;
+			float conicalHeight = std::cos(conicalPendulum.halfApexAngle) * conicalPendulum.length;
+
+			conicalPendulumBob.x = conicalPendulum.anchor.x + std::cos(conicalPendulum.angle) * conicalRadius;
+			conicalPendulumBob.y = conicalPendulum.anchor.y - conicalHeight;
+			conicalPendulumBob.z = conicalPendulum.anchor.z + std::sin(conicalPendulum.angle) * conicalRadius;
+		}
+	
 
 		//Vector3 p0p1=Lerp
 
@@ -297,12 +326,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	   Vector3 screenPendulumAnchor= Transform(Transform(pendulum.anchor, worldViewProjectionMatrix), viewportMatrix);
 	   Vector3 screenPendulumTip = Transform(Transform(pendulumTip, worldViewProjectionMatrix), viewportMatrix);
+
+	   Vector3 screenConicalPendulumAnchor = Transform(Transform(conicalPendulum.anchor, worldViewProjectionMatrix), viewportMatrix);
+	   Vector3 screenConicalPendulumBob = Transform(Transform(conicalPendulumBob, worldViewProjectionMatrix), viewportMatrix);
+
 		/*Vector3 screenVertices[3];
 		for (uint32_t i = 0; i < 3; ++i) {
 			Vector3 ndcVertex = Transform(kLocalVertices[i], worldViewProjectionMatrix);
 			screenVertices[i] = Transform(ndcVertex, viewportMatrix);
 		}*/
 
+	   
 
 		///
 		/// ↑更新処理ここまで
@@ -358,13 +392,26 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		  // RED
 	   //);
 
-	   //振り子の線分描画
+	   ////振り子の線分描画
+	   //Novice::DrawLine(
+		  // static_cast<int>(screenPendulumAnchor.x), static_cast<int>(screenPendulumAnchor.y),
+		  // static_cast<int>(screenPendulumTip.x), static_cast<int>(screenPendulumTip.y),
+		  // RED
+	   //);
+	   //DrawSphere({ pendulumTip,0.05f }, worldViewProjectionMatrix, viewportMatrix, GREEN);
+
+
+	   //**********************
+	   // 円錐振り子の線分描画
+	   //**********************
 	   Novice::DrawLine(
-		   static_cast<int>(screenPendulumAnchor.x), static_cast<int>(screenPendulumAnchor.y),
-		   static_cast<int>(screenPendulumTip.x), static_cast<int>(screenPendulumTip.y),
+		   static_cast<int>(screenConicalPendulumAnchor.x), static_cast<int>(screenConicalPendulumAnchor.y),
+		   static_cast<int>(screenConicalPendulumBob.x), static_cast<int>(screenConicalPendulumBob.y),
 		   RED
 	   );
-	   DrawSphere({ pendulumTip,0.05f }, worldViewProjectionMatrix, viewportMatrix, GREEN);
+
+	   //円錐振り子の球描画
+	   //DrawSphere({ conicalPendulumBob, 0.05f }, worldViewProjectionMatrix, viewportMatrix, GREEN);
 
 	   //球と球の当たり判定
 	/*   if (IsCollision(sphere, sphere2))
@@ -553,15 +600,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//pendulum
 		ImGui::Text("Pendulum");
 		if (ImGui::Button("Start Pendulum")) {
-			isPendulumActive = true;
+			isRunningPendulum = true;
 		}
 
 		if (ImGui::Button("Stop Pendulum")) {
-			isPendulumActive = false;
+			isRunningPendulum = false;
 		}
 
 		if (ImGui::Button("Reset Pendulum")) {
-			isPendulumActive = false;
+			isRunningPendulum = false;
 			pendulum.angle = 0.7f;
 			pendulum.angularVelocity = 0.0f;
 			pendulum.angularAcceleration = 0.0f;
@@ -569,6 +616,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			pendulumTip.x = pendulum.anchor.x + std::sin(pendulum.angle) * pendulum.length;
 			pendulumTip.y = pendulum.anchor.y - std::cos(pendulum.angle) * pendulum.length;
 			pendulumTip.z = pendulum.anchor.z;
+		}
+
+		//ConicalPendulum
+		ImGui::Text("ConicalPendulum");
+		if (ImGui::Button(isRunningConicalPendulum ? "Stop" : "Start")) {
+			isRunningConicalPendulum = !isRunningConicalPendulum;
 		}
 
 		// 最小値が最大値を超えないように制限
