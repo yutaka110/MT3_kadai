@@ -846,5 +846,13 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 	}
 }
 
+Vector3 Reflect(const Vector3& input, const Vector3& normal) {
+	float dotProduct = Dot(input, normal);
+	Vector3 reflected = input - normal * (2.0f * dotProduct);
+	return reflected;
+}
+
+
+
 
 //void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix)
