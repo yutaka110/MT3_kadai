@@ -71,6 +71,11 @@ struct AABB
 	Vector3 max;
 };
 
+struct Capsule {
+	Segment segment;
+	float radius;
+};
+
 // 構造体の外に書く！
 inline Vector3 operator+(const Vector3& lhs, const Vector3& rhs) {
 	return { lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z };
@@ -106,6 +111,7 @@ inline Vector3& operator+=(Vector3& lhs, const Vector3& rhs) {
 inline Vector3 operator*(float s, const Vector3& v) {
 	return v * s; // 上の関数を呼び出し
 }
+
 
 
 
@@ -158,3 +164,4 @@ void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Mat
 void VectorScreenPrintf(int x, int y, const Vector3 vector, const char* label);
 void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix);
 Vector3 Cross(const Vector3& v1, const Vector3& v2);
+Vector3 Reflect(const Vector3& input, const Vector3& normal);

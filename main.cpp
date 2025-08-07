@@ -107,14 +107,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	spring.dampingCoefficient = 2.0f;
 
 	Ball ball{};
-	ball.position = { 1.2f, 0.0f, 0.0f };
+	ball.position = { 1.2f, 2.0f, 0.0f };
 	ball.mass = 2.0f;
 	ball.radius = 0.05f;
 	ball.color = BLUE;
+	ball.acceleration = { 0.0f, -9.8f, 0.0f };
+	float bound = 0.6f;//反発係数
 
-	float angularVelocity = 3.14f;
+	/*float angularVelocity = 3.14f;
 	float angle = 0.0f;
-	float radius = 0.8f;
+	float radius = 0.8f;*/
 
 	//円の中心
 	Vector3 center = { 0.0f, 0.0f, 0.0f };
@@ -169,6 +171,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	//デルタタイム
 	float deltaTime = 1.0f / 60.0f;
+	
 	
 
 
@@ -265,32 +268,31 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//ball.position += ball.velocity * deltaTime;
 
 		
+		//// 角度更新（角速度 × Δt）
+		//angle += angularVelocity * deltaTime;
 
-		// 角度更新（角速度 × Δt）
-		angle += angularVelocity * deltaTime;
+		//// 位置更新（2D円運動: XY平面）
+		//position.x = center.x + std::cos(angle) * radius;
+		//position.y = center.y + std::sin(angle) * radius;
+		//position.z = center.z;
 
-		// 位置更新（2D円運動: XY平面）
-		position.x = center.x + std::cos(angle) * radius;
-		position.y = center.y + std::sin(angle) * radius;
-		position.z = center.z;
+		//if (isRunningPendulum) {
+		//	pendulum.angularAcceleration =
+		//		-(9.8f / pendulum.length) * std::sin(pendulum.angle);
 
-		if (isRunningPendulum) {
-			pendulum.angularAcceleration =
-				-(9.8f / pendulum.length) * std::sin(pendulum.angle);
+		//	pendulum.angularVelocity += pendulum.angularAcceleration * deltaTime;
+		//	pendulum.angle += pendulum.angularVelocity * deltaTime;
 
-			pendulum.angularVelocity += pendulum.angularAcceleration * deltaTime;
-			pendulum.angle += pendulum.angularVelocity * deltaTime;
-
-			// pは振り子の先端の位置。取り付けたいものを取り付ければ良い
-			pendulumTip.x = pendulum.anchor.x + std::sin(pendulum.angle) * pendulum.length;
-			pendulumTip.y = pendulum.anchor.y - std::cos(pendulum.angle) * pendulum.length;
-			pendulumTip.z = pendulum.anchor.z;
-		}
+		//	// pは振り子の先端の位置。取り付けたいものを取り付ければ良い
+		//	pendulumTip.x = pendulum.anchor.x + std::sin(pendulum.angle) * pendulum.length;
+		//	pendulumTip.y = pendulum.anchor.y - std::cos(pendulum.angle) * pendulum.length;
+		//	pendulumTip.z = pendulum.anchor.z;
+		//}
 
 		//**********************
 		// 円錐振り子の更新処理
 		//**********************
-		if (isRunningConicalPendulum) {
+		/*if (isRunningConicalPendulum) {
 			conicalPendulum.angularVelocity = std::sqrt(9.8f / (conicalPendulum.length * std::cos(conicalPendulum.halfApexAngle)));
 			conicalPendulum.angle += conicalPendulum.angularVelocity * deltaTime;
 
@@ -300,8 +302,34 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			conicalPendulumBob.x = conicalPendulum.anchor.x + std::cos(conicalPendulum.angle) * conicalRadius;
 			conicalPendulumBob.y = conicalPendulum.anchor.y - conicalHeight;
 			conicalPendulumBob.z = conicalPendulum.anchor.z + std::sin(conicalPendulum.angle) * conicalRadius;
+		}*/
+
+		//******************************
+		// 平面に対する球の衝突判定と反射処理
+		// *****************************
+		
+		// 毎フレーム更新
+		ball.velocity += ball.acceleration * deltaTime;
+		ball.position += ball.velocity * deltaTime;
+
+		// 衝突判定
+		if (IsCollision(Sphere{ ball.position, ball.radius }, plane)) {
+			// 反射ベクトル計算
+			Vector3 reflected = Reflect(ball.velocity, plane.normal);
+			Vector3 projectToNormal = Project(reflected, plane.normal);
+			Vector3 movingDirection = reflected - projectToNormal;
+
+			// 速度更新（法線方向に反射係数をかける）
+			ball.velocity = projectToNormal * bound + movingDirection;
+
+			// 🔁 位置補正：球が平面にめり込んでいたら、押し戻す
+			float distance = Dot(ball.position, plane.normal) - plane.distance;
+			float penetration = ball.radius - distance;
+
+			if (penetration > 0.0f) {
+				ball.position += plane.normal * penetration; // 法線方向に押し戻し
+			}
 		}
-	
 
 		//Vector3 p0p1=Lerp
 
@@ -382,8 +410,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		  // BLACK
 	   //);
 
-	   ////バネの球描画
-	   //DrawSphere({ ball.position, 0.05f }, worldViewProjectionMatrix, viewportMatrix, BLUE);
+	   //バネの球描画
+	   DrawSphere({ ball.position, 0.05f }, worldViewProjectionMatrix, viewportMatrix, BLUE);
 
 	   ////円運動線分描画
 	   //Novice::DrawLine(
