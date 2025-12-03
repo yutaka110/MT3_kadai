@@ -851,6 +851,71 @@ Vector3 Reflect(const Vector3& input, const Vector3& normal) {
 	Vector3 reflected = input - normal * (2.0f * dotProduct);
 	return reflected;
 }
+//==============================================
+//-------------------MT4------------------------
+//==============================================
+
+//-----------------01_01-------------------
+
+//
+Matrix4x4 MakeRotateAxisAngle(const Vector3& axis, float angle) {
+
+	Matrix4x4 result{};
+
+	// 0行列からスタート → とりあえず単位行列を入れておく
+	for (int r = 0; r < 4; ++r) {
+		for (int c = 0; c < 4; ++c) {
+			result.m[r][c] = 0.0f;
+		}
+	}
+
+	// 軸がゼロ長なら単位行列を返す
+	float len2 = axis.x * axis.x + axis.y * axis.y + axis.z * axis.z;
+	if (len2 == 0.0f) {
+		result.m[0][0] = 1.0f;
+		result.m[1][1] = 1.0f;
+		result.m[2][2] = 1.0f;
+		result.m[3][3] = 1.0f;
+		return result;
+	}
+
+	// 正規化した軸ベクトル
+	Vector3 k = Normalize(axis);
+	float x = k.x;
+	float y = k.y;
+	float z = k.z;
+
+	float c = std::cos(angle);     // cosθ
+	float s = std::sin(angle);     // sinθ
+
+	// ★ 資料に合わせるため、sin項の符号を反転させる（θ → -θ と同じ）
+	s = -s;
+
+	float t = 1.0f - c;            // 1 - cosθ
+
+	// ロドリゲスの回転公式（sin 部分は上で符号反転済み）
+	result.m[0][0] = c + t * x * x;
+	result.m[0][1] = t * x * y - s * z;
+	result.m[0][2] = t * x * z + s * y;
+	result.m[0][3] = 0.0f;
+
+	result.m[1][0] = t * x * y + s * z;
+	result.m[1][1] = c + t * y * y;
+	result.m[1][2] = t * y * z - s * x;
+	result.m[1][3] = 0.0f;
+
+	result.m[2][0] = t * x * z - s * y;
+	result.m[2][1] = t * y * z + s * x;
+	result.m[2][2] = c + t * z * z;
+	result.m[2][3] = 0.0f;
+
+	result.m[3][0] = 0.0f;
+	result.m[3][1] = 0.0f;
+	result.m[3][2] = 0.0f;
+	result.m[3][3] = 1.0f;
+
+	return result;
+}
 
 
 

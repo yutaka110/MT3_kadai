@@ -48,7 +48,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Vector3 v1{ 1.2f, -3.9f, 2.5f };
 	Vector3 v2{ 2.8f, 0.4f, -1.3f };
-	
+
 	Segment segment{ {-2.0f, -1.0f, 0.0f}, {3.0f, 2.0f, 2.0f} };
 	Vector3 point{ -1.5f, 0.6f, 0.6f };
 
@@ -122,7 +122,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 center = { 0.0f, 0.0f, 0.0f };
 
 	//現在の位置(後で更新)
-	Vector3 position = {};  
+	Vector3 position = {};
 
 	Pendulum pendulum;
 
@@ -145,7 +145,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	conicalPendulum.angularVelocity = 0.0f;
 
 	Vector3 conicalPendulumBob = { 0.0f,0.0f,0.0f };
-	
+
 	//円錐振り子の実行フラグ
 	bool isRunningConicalPendulum = false;
 
@@ -171,12 +171,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	//デルタタイム
 	float deltaTime = 1.0f / 60.0f;
-	
-	
+
+	//================================================
+	//--------------------MT4---------------------
+	//================================================
+
+	//-------------------01_01-----------------------
+	Vector3 axis = Normalize({ 1.0f,1.0f,1.0f });
+	float angle = 0.44f;
+
+	Matrix4x4 roatateMatrix = MakeRotateAxisAngle(axis,angle);
+	//Vector3 vRot = Transform(axis, roatateMatrix);
 
 
-
-	
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
 		// フレームの開始
@@ -216,7 +223,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		//クロス積の計算
 		Vector3 cross = Cross(v1, v2);
-		
+
 
 		// point を線分に射影したベクトル
 		Vector3 project = Project(Subtract(point, segment.origin), segment.diff);
@@ -267,7 +274,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//ball.velocity += ball.acceleration * deltaTime;
 		//ball.position += ball.velocity * deltaTime;
 
-		
+
 		//// 角度更新（角速度 × Δt）
 		//angle += angularVelocity * deltaTime;
 
@@ -307,7 +314,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//******************************
 		// 平面に対する球の衝突判定と反射処理
 		// *****************************
-		
+
 		// 毎フレーム更新
 		ball.velocity += ball.acceleration * deltaTime;
 		ball.position += ball.velocity * deltaTime;
@@ -338,25 +345,25 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 		// 各種行列の計算
-	   worldMatrix = MakeAffineMatrix({ 1.0f, 1.0f, 1.0f }, cameraRotate, cameraTranslate);
-	   cameraMatrix = MakeAffineMatrix({ 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 0.0f }, cameraPosition);
-	   viewMatrix = Inverse(cameraMatrix);
-	   projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(kWindowWidth) / float(kWindowHeight), 0.1f, 100.0f);
-	   worldViewProjectionMatrix = Multiply(Multiply(worldMatrix, viewMatrix), projectionMatrix);
-	   viewportMatrix = MakeViewportMatrix(0, 0, float(kWindowWidth), float(kWindowHeight), 0.0f, 1.0f);
+		worldMatrix = MakeAffineMatrix({ 1.0f, 1.0f, 1.0f }, cameraRotate, cameraTranslate);
+		cameraMatrix = MakeAffineMatrix({ 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 0.0f }, cameraPosition);
+		viewMatrix = Inverse(cameraMatrix);
+		projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(kWindowWidth) / float(kWindowHeight), 0.1f, 100.0f);
+		worldViewProjectionMatrix = Multiply(Multiply(worldMatrix, viewMatrix), projectionMatrix);
+		viewportMatrix = MakeViewportMatrix(0, 0, float(kWindowWidth), float(kWindowHeight), 0.0f, 1.0f);
 
-	   // anchor → ball.position を線で結ぶ（ばね表示）
-	   Vector3 anchorScreen = Transform(Transform(spring.anchor, worldViewProjectionMatrix), viewportMatrix);
-	   Vector3 ballScreen = Transform(Transform(ball.position, worldViewProjectionMatrix), viewportMatrix);
+		// anchor → ball.position を線で結ぶ（ばね表示）
+		Vector3 anchorScreen = Transform(Transform(spring.anchor, worldViewProjectionMatrix), viewportMatrix);
+		Vector3 ballScreen = Transform(Transform(ball.position, worldViewProjectionMatrix), viewportMatrix);
 
-	   Vector3 screenCenter = Transform(Transform(center, worldViewProjectionMatrix), viewportMatrix);
-	   Vector3 screenPos = Transform(Transform(position, worldViewProjectionMatrix), viewportMatrix);
+		Vector3 screenCenter = Transform(Transform(center, worldViewProjectionMatrix), viewportMatrix);
+		Vector3 screenPos = Transform(Transform(position, worldViewProjectionMatrix), viewportMatrix);
 
-	   Vector3 screenPendulumAnchor= Transform(Transform(pendulum.anchor, worldViewProjectionMatrix), viewportMatrix);
-	   Vector3 screenPendulumTip = Transform(Transform(pendulumTip, worldViewProjectionMatrix), viewportMatrix);
+		Vector3 screenPendulumAnchor = Transform(Transform(pendulum.anchor, worldViewProjectionMatrix), viewportMatrix);
+		Vector3 screenPendulumTip = Transform(Transform(pendulumTip, worldViewProjectionMatrix), viewportMatrix);
 
-	   Vector3 screenConicalPendulumAnchor = Transform(Transform(conicalPendulum.anchor, worldViewProjectionMatrix), viewportMatrix);
-	   Vector3 screenConicalPendulumBob = Transform(Transform(conicalPendulumBob, worldViewProjectionMatrix), viewportMatrix);
+		Vector3 screenConicalPendulumAnchor = Transform(Transform(conicalPendulum.anchor, worldViewProjectionMatrix), viewportMatrix);
+		Vector3 screenConicalPendulumBob = Transform(Transform(conicalPendulumBob, worldViewProjectionMatrix), viewportMatrix);
 
 		/*Vector3 screenVertices[3];
 		for (uint32_t i = 0; i < 3; ++i) {
@@ -364,7 +371,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			screenVertices[i] = Transform(ndcVertex, viewportMatrix);
 		}*/
 
-	   
+
 
 		///
 		/// ↑更新処理ここまで
@@ -375,180 +382,184 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 
 
-	   Vector3 start = Transform(Transform(segment.origin, worldViewProjectionMatrix), viewportMatrix);
-	   Vector3 end = Transform(Transform(Add(segment.origin, segment.diff), worldViewProjectionMatrix), viewportMatrix);
-	  
-	  
-
-	   //グリッドの描画
-	   DrawGrid(worldViewProjectionMatrix, viewportMatrix);
-
-	   Vector3 shoulderScreen = Transform(shoulderWorldPos, worldViewProjectionMatrix);
-	   shoulderScreen = Transform(shoulderScreen, viewportMatrix);
-
-	   Vector3 elbowScreen = Transform(elbowWorldPos, worldViewProjectionMatrix);
-	   elbowScreen = Transform(elbowScreen, viewportMatrix);
-
-	   Vector3 handScreen = Transform(handWorldPos, worldViewProjectionMatrix);
-	   handScreen = Transform(handScreen, viewportMatrix);
-
-	   // 球の描画（肩：赤、肘：緑、手：青）
-	   DrawSphere({ shoulderWorldPos, 0.05f }, worldViewProjectionMatrix, viewportMatrix, RED);
-	   DrawSphere({ elbowWorldPos, 0.05f }, worldViewProjectionMatrix, viewportMatrix, GREEN);
-	   DrawSphere({ handWorldPos, 0.05f }, worldViewProjectionMatrix, viewportMatrix, BLUE);
-
-	   // 関節をつなぐ線の描画
-	   Novice::DrawLine((int)shoulderScreen.x, (int)shoulderScreen.y,
-		   (int)elbowScreen.x, (int)elbowScreen.y, WHITE);
-	   Novice::DrawLine((int)elbowScreen.x, (int)elbowScreen.y,
-		   (int)handScreen.x, (int)handScreen.y, WHITE);
-
-	   ////バネの線分描画
-	   //Novice::DrawLine(
-		  // static_cast<int>(anchorScreen.x), static_cast<int>(anchorScreen.y),
-		  // static_cast<int>(ballScreen.x), static_cast<int>(ballScreen.y),
-		  // BLACK
-	   //);
-
-	   //バネの球描画
-	   DrawSphere({ ball.position, 0.05f }, worldViewProjectionMatrix, viewportMatrix, BLUE);
-
-	   ////円運動線分描画
-	   //Novice::DrawLine(
-		  // static_cast<int>(screenCenter.x), static_cast<int>(screenCenter.y),
-		  // static_cast<int>(screenPos.x), static_cast<int>(screenPos.y),
-		  // RED
-	   //);
-
-	   ////振り子の線分描画
-	   //Novice::DrawLine(
-		  // static_cast<int>(screenPendulumAnchor.x), static_cast<int>(screenPendulumAnchor.y),
-		  // static_cast<int>(screenPendulumTip.x), static_cast<int>(screenPendulumTip.y),
-		  // RED
-	   //);
-	   //DrawSphere({ pendulumTip,0.05f }, worldViewProjectionMatrix, viewportMatrix, GREEN);
+		Vector3 start = Transform(Transform(segment.origin, worldViewProjectionMatrix), viewportMatrix);
+		Vector3 end = Transform(Transform(Add(segment.origin, segment.diff), worldViewProjectionMatrix), viewportMatrix);
 
 
-	   //**********************
-	   // 円錐振り子の線分描画
-	   //**********************
-	   Novice::DrawLine(
-		   static_cast<int>(screenConicalPendulumAnchor.x), static_cast<int>(screenConicalPendulumAnchor.y),
-		   static_cast<int>(screenConicalPendulumBob.x), static_cast<int>(screenConicalPendulumBob.y),
-		   RED
-	   );
 
-	   //円錐振り子の球描画
-	   //DrawSphere({ conicalPendulumBob, 0.05f }, worldViewProjectionMatrix, viewportMatrix, GREEN);
+		//グリッドの描画
+		DrawGrid(worldViewProjectionMatrix, viewportMatrix);
 
-	   //球と球の当たり判定
-	/*   if (IsCollision(sphere, sphere2))
-	   {
-		   DrawSphere(sphere2, worldViewProjectionMatrix, viewportMatrix, RED);
-	   }
-	   else
-	   {
-		   DrawSphere(sphere2, worldViewProjectionMatrix, viewportMatrix, WHITE);
-	   }
+		Vector3 shoulderScreen = Transform(shoulderWorldPos, worldViewProjectionMatrix);
+		shoulderScreen = Transform(shoulderScreen, viewportMatrix);
 
-	   DrawSphere(sphere, worldViewProjectionMatrix, viewportMatrix, WHITE);*/
+		Vector3 elbowScreen = Transform(elbowWorldPos, worldViewProjectionMatrix);
+		elbowScreen = Transform(elbowScreen, viewportMatrix);
 
-	   
+		Vector3 handScreen = Transform(handWorldPos, worldViewProjectionMatrix);
+		handScreen = Transform(handScreen, viewportMatrix);
 
-	   ////平面と球の当たり判定
-    //   if (IsCollision(sphere, plane))
-	   //{
-		  // DrawSphere(sphere, worldViewProjectionMatrix, viewportMatrix, RED);
-	   //}
-	   //else
-	   //{
-		  // DrawSphere(sphere, worldViewProjectionMatrix, viewportMatrix, WHITE);
-	   //}
+		// 球の描画（肩：赤、肘：緑、手：青）
+		DrawSphere({ shoulderWorldPos, 0.05f }, worldViewProjectionMatrix, viewportMatrix, RED);
+		DrawSphere({ elbowWorldPos, 0.05f }, worldViewProjectionMatrix, viewportMatrix, GREEN);
+		DrawSphere({ handWorldPos, 0.05f }, worldViewProjectionMatrix, viewportMatrix, BLUE);
 
-	   //線と平面の当たり判定
-	  /* if (IsCollision(segment, plane))
-	   {
-		   DrawPlane(plane, worldViewProjectionMatrix, viewportMatrix, RED);
-		  
-	   }
-	   else
-	   {
-		   DrawPlane(plane, worldViewProjectionMatrix, viewportMatrix, WHITE);
-	   }
+		// 関節をつなぐ線の描画
+		Novice::DrawLine((int)shoulderScreen.x, (int)shoulderScreen.y,
+			(int)elbowScreen.x, (int)elbowScreen.y, WHITE);
+		Novice::DrawLine((int)elbowScreen.x, (int)elbowScreen.y,
+			(int)handScreen.x, (int)handScreen.y, WHITE);
 
-	   DrawTriangle(triangle, worldViewProjectionMatrix, viewportMatrix, WHITE);*/
-
-	   //DrawSphere(sphere, worldViewProjectionMatrix, viewportMatrix, WHITE);
-
-	  /* if (IsCollision(triangle, segment))
-	   {
-		   Novice::DrawLine(
-			   int(start.x), int(start.y),
-			   int(end.x), int(end.y),
-			   RED
-		   );
-	   }
-	   else
-	   {
-		   Novice::DrawLine(
-			   int(start.x), int(start.y),
-			   int(end.x), int(end.y),
-			   WHITE
-		   );
-	   }*/
-
-	   //AABBと線分の衝突判定
-	   /*if (IsCollision(aabb1, segment))
-	   {
-		   Novice::DrawLine(
-			   int(start.x), int(start.y),
-			   int(end.x), int(end.y),
-			   RED
-		   );
-	   }
-	   else
-	   {
-		   Novice::DrawLine(
-			   int(start.x), int(start.y),
-			   int(end.x), int(end.y),
-			   WHITE
-		   );
-	   }*/
-
-	   //AABBの描画
-	   /*if (IsCollision(aabb1, aabb2))
-	   {
-		   DrawAABB(aabb1, worldViewProjectionMatrix, viewportMatrix, RED);
-	   }
-	   else
-	   {
-		   DrawAABB(aabb1, worldViewProjectionMatrix, viewportMatrix, WHITE);
-	   }*/
-
-	  // DrawAABB(aabb2, worldViewProjectionMatrix, viewportMatrix, WHITE);
-
-	   ////球とAABBの衝突判定
-	   //if (IsCollision(aabb1, sphere))
-	   //{
-		  // DrawAABB(aabb1, worldViewProjectionMatrix, viewportMatrix, RED);
-	   //}
-	   //else
-	   //{
-		  // DrawAABB(aabb1, worldViewProjectionMatrix, viewportMatrix, WHITE);
-	   //}
-
-		//// 描画
-		//Novice::DrawTriangle(
-		//	int(screenVertices[0].x), int(screenVertices[0].y),
-		//	int(screenVertices[1].x), int(screenVertices[1].y),
-		//	int(screenVertices[2].x), int(screenVertices[2].y), RED, kFillModeSolid
+		////バネの線分描画
+		//Novice::DrawLine(
+		   // static_cast<int>(anchorScreen.x), static_cast<int>(anchorScreen.y),
+		   // static_cast<int>(ballScreen.x), static_cast<int>(ballScreen.y),
+		   // BLACK
 		//);
 
-	   DrawBezier(controlPoints[0], controlPoints[1], controlPoints[2], worldViewProjectionMatrix, viewportMatrix, WHITE);
-	   for (int i = 0; i < 3; ++i) {
-		   DrawSphere(controlPointsSphere[i], worldViewProjectionMatrix, viewportMatrix, WHITE);
-	   }
-		VectorScreenPrintf(0, 0, cross, "Cross");
+		//バネの球描画
+		DrawSphere({ ball.position, 0.05f }, worldViewProjectionMatrix, viewportMatrix, BLUE);
+
+		////円運動線分描画
+		//Novice::DrawLine(
+		   // static_cast<int>(screenCenter.x), static_cast<int>(screenCenter.y),
+		   // static_cast<int>(screenPos.x), static_cast<int>(screenPos.y),
+		   // RED
+		//);
+
+		////振り子の線分描画
+		//Novice::DrawLine(
+		   // static_cast<int>(screenPendulumAnchor.x), static_cast<int>(screenPendulumAnchor.y),
+		   // static_cast<int>(screenPendulumTip.x), static_cast<int>(screenPendulumTip.y),
+		   // RED
+		//);
+		//DrawSphere({ pendulumTip,0.05f }, worldViewProjectionMatrix, viewportMatrix, GREEN);
+
+
+		//**********************
+		// 円錐振り子の線分描画
+		//**********************
+		Novice::DrawLine(
+			static_cast<int>(screenConicalPendulumAnchor.x), static_cast<int>(screenConicalPendulumAnchor.y),
+			static_cast<int>(screenConicalPendulumBob.x), static_cast<int>(screenConicalPendulumBob.y),
+			RED
+		);
+
+		//円錐振り子の球描画
+		//DrawSphere({ conicalPendulumBob, 0.05f }, worldViewProjectionMatrix, viewportMatrix, GREEN);
+
+		//球と球の当たり判定
+	 /*   if (IsCollision(sphere, sphere2))
+		{
+			DrawSphere(sphere2, worldViewProjectionMatrix, viewportMatrix, RED);
+		}
+		else
+		{
+			DrawSphere(sphere2, worldViewProjectionMatrix, viewportMatrix, WHITE);
+		}
+
+		DrawSphere(sphere, worldViewProjectionMatrix, viewportMatrix, WHITE);*/
+
+
+
+		////平面と球の当たり判定
+	 //   if (IsCollision(sphere, plane))
+		//{
+		   // DrawSphere(sphere, worldViewProjectionMatrix, viewportMatrix, RED);
+		//}
+		//else
+		//{
+		   // DrawSphere(sphere, worldViewProjectionMatrix, viewportMatrix, WHITE);
+		//}
+
+		//線と平面の当たり判定
+	   /* if (IsCollision(segment, plane))
+		{
+			DrawPlane(plane, worldViewProjectionMatrix, viewportMatrix, RED);
+
+		}
+		else
+		{
+			DrawPlane(plane, worldViewProjectionMatrix, viewportMatrix, WHITE);
+		}
+
+		DrawTriangle(triangle, worldViewProjectionMatrix, viewportMatrix, WHITE);*/
+
+		//DrawSphere(sphere, worldViewProjectionMatrix, viewportMatrix, WHITE);
+
+	   /* if (IsCollision(triangle, segment))
+		{
+			Novice::DrawLine(
+				int(start.x), int(start.y),
+				int(end.x), int(end.y),
+				RED
+			);
+		}
+		else
+		{
+			Novice::DrawLine(
+				int(start.x), int(start.y),
+				int(end.x), int(end.y),
+				WHITE
+			);
+		}*/
+
+		//AABBと線分の衝突判定
+		/*if (IsCollision(aabb1, segment))
+		{
+			Novice::DrawLine(
+				int(start.x), int(start.y),
+				int(end.x), int(end.y),
+				RED
+			);
+		}
+		else
+		{
+			Novice::DrawLine(
+				int(start.x), int(start.y),
+				int(end.x), int(end.y),
+				WHITE
+			);
+		}*/
+
+		//AABBの描画
+		/*if (IsCollision(aabb1, aabb2))
+		{
+			DrawAABB(aabb1, worldViewProjectionMatrix, viewportMatrix, RED);
+		}
+		else
+		{
+			DrawAABB(aabb1, worldViewProjectionMatrix, viewportMatrix, WHITE);
+		}*/
+
+		// DrawAABB(aabb2, worldViewProjectionMatrix, viewportMatrix, WHITE);
+
+		 ////球とAABBの衝突判定
+		 //if (IsCollision(aabb1, sphere))
+		 //{
+			// DrawAABB(aabb1, worldViewProjectionMatrix, viewportMatrix, RED);
+		 //}
+		 //else
+		 //{
+			// DrawAABB(aabb1, worldViewProjectionMatrix, viewportMatrix, WHITE);
+		 //}
+
+		  //// 描画
+		  //Novice::DrawTriangle(
+		  //	int(screenVertices[0].x), int(screenVertices[0].y),
+		  //	int(screenVertices[1].x), int(screenVertices[1].y),
+		  //	int(screenVertices[2].x), int(screenVertices[2].y), RED, kFillModeSolid
+		  //);
+
+        //-----------------MT4----------------------
+		//Novice::ScreenPrintf(0, 0, "%f", vRot);
+        MatrixScreenPrintf(0, 0, roatateMatrix);
+
+		DrawBezier(controlPoints[0], controlPoints[1], controlPoints[2], worldViewProjectionMatrix, viewportMatrix, WHITE);
+		for (int i = 0; i < 3; ++i) {
+			DrawSphere(controlPointsSphere[i], worldViewProjectionMatrix, viewportMatrix, WHITE);
+		}
+		//VectorScreenPrintf(0, 0, cross, "Cross");
 
 		ImGui::Begin("Window");
 
@@ -565,9 +576,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::DragFloat3("Segment.Diff", &segment.diff.x, 0.01f);
 
 		//正規化
-		plane.normal = Normalize(plane.normal); 
+		plane.normal = Normalize(plane.normal);
 
-		
+
 		ImGui::DragFloat3("AABB1 Min", &aabb1.min.x, 0.01f);
 		ImGui::DragFloat3("AABB1 Max", &aabb1.max.x, 0.01f);
 
@@ -615,7 +626,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		if (ImGui::Button("Reset")) {
 			// Spring側は必要ならリセット
 			spring.anchor = { 0.0f, 0.0f, 0.0f };
-			
+
 
 			// Ballの状態リセット
 			ball.position = { 1.2f, 0.0f, 0.0f };
@@ -676,7 +687,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 		ImGui::End();
-		
+
 		///
 		/// ↑描画処理ここまで
 		///
