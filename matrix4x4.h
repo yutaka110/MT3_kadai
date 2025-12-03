@@ -165,3 +165,10 @@ void VectorScreenPrintf(int x, int y, const Vector3 vector, const char* label);
 void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix);
 Vector3 Cross(const Vector3& v1, const Vector3& v2);
 Vector3 Reflect(const Vector3& input, const Vector3& normal);
+
+//=============================================================
+//---------------------------MT4-------------------------------
+//=============================================================
+
+//--------------------------01_01------------------------------
+Matrix4x4 MakeRotateAxisAngle(const Vector3& axis, float angle);
