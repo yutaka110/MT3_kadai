@@ -7,6 +7,8 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include"Pendulum.h"
+#include "Quaternion.h"
+
 const char kWindowTitle[] = "LE2B_17_タケイ_ユタカ_タイトル";
 //static Vector3 MulMat3Vec3_NoTranslate(const Matrix4x4& m, const Vector3& v)
 //{
@@ -210,6 +212,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			Normalize(gTo[i])
 		);
 	}
+
+	// ===== Quaternion 課題確認 =====
+	Quaternion q1 = { 2.0f, 3.0f, 4.0f, 1.0f };
+	Quaternion q2 = { 1.0f, 3.0f, 5.0f, 2.0f };
+
+	Quaternion identity = IdentityQuaternion();
+	Quaternion conj = ConjugateQuaternion(q1);
+	Quaternion inv = InverseQuaternion(q1);
+	Quaternion normalQ = NormalizeQuaternion(q1);
+	Quaternion mul1 = MultiplyQuaternion(q1, q2);
+	Quaternion mul2 = MultiplyQuaternion(q2, q1);
+	float normQ = NormQuaternion(q1);
+
 
 
 	// ウィンドウの×ボタンが押されるまでループ
@@ -475,7 +490,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 		// ===== DirectionToDirection 確認（完成イメージ用）=====
-		const int kRowHeight = 20;   // 1行の高さ（見やすければ調整OK）
+		//const int kRowHeight = 20;   // 1行の高さ（見やすければ調整OK）
 
 		Vector3 from0 = Normalize(Vector3{ 1.0f, 0.7f, 0.5f });
 		Vector3 to0 = -from0;
@@ -492,15 +507,57 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Matrix4x4 rotateMatrix1 = DirectionToDirection(from0, to0);
 		Matrix4x4 rotateMatrix2 = DirectionToDirection(from1, to1);
 
-		// ラベル（あなたの MatrixScreenPrintf は3引数なので自前で出す）
-		Novice::ScreenPrintf(0, 0, "rotateMatrix0");
-		MatrixScreenPrintf(0, kRowHeight * 1, rotateMatrix0);
+		//// ラベル（あなたの MatrixScreenPrintf は3引数なので自前で出す）
+		//Novice::ScreenPrintf(0, 0, "rotateMatrix0");
+		//MatrixScreenPrintf(0, kRowHeight * 1, rotateMatrix0);
 
-		Novice::ScreenPrintf(0, kRowHeight * 6, "rotateMatrix1");
-		MatrixScreenPrintf(0, kRowHeight * 7, rotateMatrix1);
+		//Novice::ScreenPrintf(0, kRowHeight * 6, "rotateMatrix1");
+		//MatrixScreenPrintf(0, kRowHeight * 7, rotateMatrix1);
 
-		Novice::ScreenPrintf(0, kRowHeight * 12, "rotateMatrix2");
-		MatrixScreenPrintf(0, kRowHeight * 13, rotateMatrix2);
+		//Novice::ScreenPrintf(0, kRowHeight * 12, "rotateMatrix2");
+		//MatrixScreenPrintf(0, kRowHeight * 13, rotateMatrix2);
+
+		int y = 0;
+
+		Novice::ScreenPrintf(0, y, "Identity");
+		y += 20;
+		Novice::ScreenPrintf(0, y, "%.2f %.2f %.2f %.2f",
+			identity.x, identity.y, identity.z, identity.w);
+
+		y += 40;
+		Novice::ScreenPrintf(0, y, "Conjugate");
+		y += 20;
+		Novice::ScreenPrintf(0, y, "%.2f %.2f %.2f %.2f",
+			conj.x, conj.y, conj.z, conj.w);
+
+		y += 40;
+		Novice::ScreenPrintf(0, y, "Inverse");
+		y += 20;
+		Novice::ScreenPrintf(0, y, "%.2f %.2f %.2f %.2f",
+			inv.x, inv.y, inv.z, inv.w);
+
+		y += 40;
+		Novice::ScreenPrintf(0, y, "Normalize");
+		y += 20;
+		Novice::ScreenPrintf(0, y, "%.2f %.2f %.2f %.2f",
+			normalQ.x, normalQ.y, normalQ.z, normalQ.w);
+
+		y += 40;
+		Novice::ScreenPrintf(0, y, "Multiply(q1, q2)");
+		y += 20;
+		Novice::ScreenPrintf(0, y, "%.2f %.2f %.2f %.2f",
+			mul1.x, mul1.y, mul1.z, mul1.w);
+
+		y += 40;
+		Novice::ScreenPrintf(0, y, "Multiply(q2, q1)");
+		y += 20;
+		Novice::ScreenPrintf(0, y, "%.2f %.2f %.2f %.2f",
+			mul2.x, mul2.y, mul2.z, mul2.w);
+
+		y += 40;
+		Novice::ScreenPrintf(0, y, "Norm");
+		y += 20;
+		Novice::ScreenPrintf(0, y, "%.2f", normQ);
 
 
 

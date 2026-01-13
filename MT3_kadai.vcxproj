@@ -111,6 +111,7 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
     <ClCompile Include="C:\KamataEngine\Adapter\Novice.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="matrix4x4.cpp" />
+    <ClCompile Include="Quaternion.cpp" />
     <ClCompile Include="spring.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -143,6 +144,7 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
     <ClInclude Include="C:\KamataEngine\Adapter\Novice.h" />
     <ClInclude Include="matrix4x4.h" />
     <ClInclude Include="Pendulum.h" />
+    <ClInclude Include="Quaternion.h" />
     <ClInclude Include="Spring.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
