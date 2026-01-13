@@ -68,6 +68,37 @@ Matrix4x4 Multiply(Matrix4x4 m1, Matrix4x4 m2)
 	return result;
 }
 
+//static Matrix4x4 MakeIdentity4x4() {
+//	Matrix4x4 m{};
+//	m.m[0][0] = 1.0f;
+//	m.m[1][1] = 1.0f;
+//	m.m[2][2] = 1.0f;
+//	m.m[3][3] = 1.0f;
+//	return m;
+//}
+//
+//static float ClampFloat(float x, float minv, float maxv) {
+//	if (x < minv) return minv;
+//	if (x > maxv) return maxv;
+//	return x;
+//}
+//
+//static Matrix4x4 MultiplyMatrix(const Matrix4x4& a, const Matrix4x4& b) {
+//	Matrix4x4 r{};
+//	for (int i = 0; i < 4; i++) {
+//		for (int j = 0; j < 4; j++) {
+//			r.m[i][j] = 0.0f;
+//			for (int k = 0; k < 4; k++) {
+//				r.m[i][j] += a.m[i][k] * b.m[k][j];
+//			}
+//		}
+//	}
+//	return r;
+//}
+
+// ===== 本体 =====
+
+
 //Matrix4x4 Inverse(Matrix4x4& m)
 //{
 //	Matrix4x4 result;
@@ -916,6 +947,53 @@ Matrix4x4 MakeRotateAxisAngle(const Vector3& axis, float angle) {
 
 	return result;
 }
+
+Matrix4x4 DirectionToDirection(const Vector3& from, const Vector3& to)
+{
+	const float EPS = 1e-6f;
+
+	Vector3 v = Normalize(from);
+	Vector3 w = Normalize(to);
+
+	// ゼロベクトル対策
+	if (Length(v) < EPS || Length(w) < EPS) {
+		return MakeIdentit4x4(); // 既存の単位行列関数名に合わせて（あなたのファイルにある）
+	}
+
+	float c = Dot(v, w);
+	if (c > 1.0f) c = 1.0f;
+	if (c < -1.0f) c = -1.0f;
+
+	// 同方向
+	if (c > 1.0f - 1e-5f) {
+		return MakeIdentit4x4();
+	}
+
+	// 逆方向（180度回転）
+	if (c < -1.0f + 1e-5f) {
+
+		// ★完成イメージに寄せるため、軸候補を Z優先にする
+		// v と平行になりにくい基準軸を選ぶ（まず Z、ダメなら Y）
+		Vector3 axisCandidate = (fabsf(v.z) < 0.9f) ? Vector3{ 0,0,1 } : Vector3{ 0,1,0 };
+
+		// 回転軸 u は v と直交になる
+		Vector3 u = Normalize(Cross(v, axisCandidate));
+
+		// あなたの MakeRotateAxisAngle は sin を反転する流儀なので角度は -π
+		return MakeRotateAxisAngle(u, -3.1415926535f);
+	}
+
+
+	// 通常：軸と角
+	Vector3 axis = Cross(v, w);
+	axis = Normalize(axis);
+
+	float theta = acosf(c);
+
+	//重要：あなたの MakeRotateAxisAngle は sin項を反転するので「-theta」を渡す
+	return MakeRotateAxisAngle(axis, -theta);
+}
+
 
 
 

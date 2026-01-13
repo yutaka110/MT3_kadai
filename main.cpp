@@ -8,6 +8,14 @@
 #include <cmath>
 #include"Pendulum.h"
 const char kWindowTitle[] = "LE2B_17_タケイ_ユタカ_タイトル";
+//static Vector3 MulMat3Vec3_NoTranslate(const Matrix4x4& m, const Vector3& v)
+//{
+//	Vector3 r;
+//	r.x = v.x * m.m[0][0] + v.y * m.m[1][0] + v.z * m.m[2][0];
+//	r.y = v.x * m.m[0][1] + v.y * m.m[1][1] + v.z * m.m[2][1];
+//	r.z = v.x * m.m[0][2] + v.y * m.m[1][2] + v.z * m.m[2][2];
+//	return r;
+//}
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
@@ -182,6 +190,26 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Matrix4x4 roatateMatrix = MakeRotateAxisAngle(axis,angle);
 	//Vector3 vRot = Transform(axis, roatateMatrix);
+	// ===== DirectionToDirection テスト用 =====
+	static Vector3 gFrom[3] = {
+		{ 1.0f,  0.0f,  0.0f},
+		{-0.6f,  0.9f,  0.2f},
+		{ 0.0f,  1.0f,  0.0f}
+	};
+
+	static Vector3 gTo[3] = {
+		{-1.0f,  0.0f,  0.0f},
+		{ 0.4f,  0.7f, -0.5f},
+		{ 0.0f,  0.0f,  1.0f}
+	};
+
+	static Matrix4x4 gRotate[3];
+	for (int i = 0; i < 3; i++) {
+		gRotate[i] = DirectionToDirection(
+			Normalize(gFrom[i]),
+			Normalize(gTo[i])
+		);
+	}
 
 
 	// ウィンドウの×ボタンが押されるまでループ
@@ -445,6 +473,37 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			RED
 		);
 
+
+		// ===== DirectionToDirection 確認（完成イメージ用）=====
+		const int kRowHeight = 20;   // 1行の高さ（見やすければ調整OK）
+
+		Vector3 from0 = Normalize(Vector3{ 1.0f, 0.7f, 0.5f });
+		Vector3 to0 = -from0;
+
+		Vector3 from1 = Normalize(Vector3{ -0.6f, 0.9f, 0.2f });
+		Vector3 to1 = Normalize(Vector3{ 0.4f, 0.7f, -0.5f });
+
+		Matrix4x4 rotateMatrix0 =
+			DirectionToDirection(
+				Normalize(Vector3{ 1.0f, 0.0f, 0.0f }),
+				Normalize(Vector3{ -1.0f, 0.0f, 0.0f })
+			);
+
+		Matrix4x4 rotateMatrix1 = DirectionToDirection(from0, to0);
+		Matrix4x4 rotateMatrix2 = DirectionToDirection(from1, to1);
+
+		// ラベル（あなたの MatrixScreenPrintf は3引数なので自前で出す）
+		Novice::ScreenPrintf(0, 0, "rotateMatrix0");
+		MatrixScreenPrintf(0, kRowHeight * 1, rotateMatrix0);
+
+		Novice::ScreenPrintf(0, kRowHeight * 6, "rotateMatrix1");
+		MatrixScreenPrintf(0, kRowHeight * 7, rotateMatrix1);
+
+		Novice::ScreenPrintf(0, kRowHeight * 12, "rotateMatrix2");
+		MatrixScreenPrintf(0, kRowHeight * 13, rotateMatrix2);
+
+
+
 		//円錐振り子の球描画
 		//DrawSphere({ conicalPendulumBob, 0.05f }, worldViewProjectionMatrix, viewportMatrix, GREEN);
 
@@ -553,7 +612,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
         //-----------------MT4----------------------
 		//Novice::ScreenPrintf(0, 0, "%f", vRot);
-        MatrixScreenPrintf(0, 0, roatateMatrix);
+        //MatrixScreenPrintf(0, 0, roatateMatrix);
 
 		DrawBezier(controlPoints[0], controlPoints[1], controlPoints[2], worldViewProjectionMatrix, viewportMatrix, WHITE);
 		for (int i = 0; i < 3; ++i) {
@@ -610,13 +669,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::Text("d:%f, %f, %f", d.x, d.y, d.z);
 		ImGui::Text("e:%f, %f, %f", e.x, e.y, e.z);
 
-		ImGui::Text(
+		/*ImGui::Text(
 			"matrix:\n%f, %f, %f, %f\n%f, %f, %f, %f\n%f, %f, %f, %f\n%f, %f, %f, %f\n",
 			rotateMatrix.m[0][0], rotateMatrix.m[0][1], rotateMatrix.m[0][2], rotateMatrix.m[0][3],
 			rotateMatrix.m[1][0], rotateMatrix.m[1][1], rotateMatrix.m[1][2], rotateMatrix.m[1][3],
 			rotateMatrix.m[2][0], rotateMatrix.m[2][1], rotateMatrix.m[2][2], rotateMatrix.m[2][3],
 			rotateMatrix.m[3][0], rotateMatrix.m[3][1], rotateMatrix.m[3][2], rotateMatrix.m[3][3]
-		);
+		);*/
 
 		//spring
 		ImGui::Text("SPring");
