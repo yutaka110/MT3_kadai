@@ -490,7 +490,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 		// ===== DirectionToDirection 確認（完成イメージ用）=====
-		const int kRowHeight = 20;   // 1行の高さ（見やすければ調整OK）
+		//const int kRowHeight = 20;   // 1行の高さ（見やすければ調整OK）
 
 		Vector3 from0 = Normalize(Vector3{ 1.0f, 0.7f, 0.5f });
 		Vector3 to0 = -from0;
@@ -562,7 +562,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Novice::ScreenPrintf(0, y, "%.2f", normQ);*/
 
 		//01_04確認課題
-		Quaternion rotation = MakeRotateAxisAngleQuaternion(
+		/*Quaternion rotation = MakeRotateAxisAngleQuaternion(
 			Normalize(Vector3{ 1.0f, 0.4f, -0.2f }), 0.45f);
 
 		Vector3 pointY = { 2.1f, -0.9f, 1.3f };
@@ -579,7 +579,24 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		MatrixScreenPrintf(0, kRowHeight * 3, rotateM);
 		VectorScreenPrintf(0, kRowHeight * 8, rotateByQuaternion, "rotateByQuaternion");
-		VectorScreenPrintf(0, kRowHeight * 9, rotateByMatrix, "rotateByMatrix");
+		VectorScreenPrintf(0, kRowHeight * 9, rotateByMatrix, "rotateByMatrix");*/
+
+		//01_05確認課題
+		Quaternion rotation0 = MakeRotateAxisAngleQuaternion(Normalize(Vector3{ 0.7f, 0.7f, 0.0f }), 0.3f);
+		Quaternion rotation1 = MakeRotateAxisAngleQuaternion(Normalize(Vector3{ 0.7f, 0.0f, 0.7f }), 3.141592f);
+
+		Quaternion interpolate0 = Slerp(rotation0, rotation1, 0.0f);
+		Quaternion interpolate1 = Slerp(rotation0, rotation1, 0.3f);
+		Quaternion interpolate2 = Slerp(rotation0, rotation1, 0.5f);
+		Quaternion interpolate3 = Slerp(rotation0, rotation1, 0.7f);
+		Quaternion interpolate4 = Slerp(rotation0, rotation1, 1.0f);
+
+		// 表示（QuaternionScreenPrintfが無いならScreenPrintfでOK）
+		Novice::ScreenPrintf(0, 0, "%.2f %.2f %.2f %.2f : interpolate0", interpolate0.x, interpolate0.y, interpolate0.z, interpolate0.w);
+		Novice::ScreenPrintf(0, 20, "%.2f %.2f %.2f %.2f : interpolate1", interpolate1.x, interpolate1.y, interpolate1.z, interpolate1.w);
+		Novice::ScreenPrintf(0, 40, "%.2f %.2f %.2f %.2f : interpolate2", interpolate2.x, interpolate2.y, interpolate2.z, interpolate2.w);
+		Novice::ScreenPrintf(0, 60, "%.2f %.2f %.2f %.2f : interpolate3", interpolate3.x, interpolate3.y, interpolate3.z, interpolate3.w);
+		Novice::ScreenPrintf(0, 80, "%.2f %.2f %.2f %.2f : interpolate4", interpolate4.x, interpolate4.y, interpolate4.z, interpolate4.w);
 
 
 		//円錐振り子の球描画

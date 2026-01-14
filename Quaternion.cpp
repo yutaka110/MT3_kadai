@@ -101,3 +101,56 @@ Matrix4x4 MakeRotateMatrix(const Quaternion& qIn)
 
     return m;
 }
+
+static float DotQuaternion(const Quaternion& a, const Quaternion& b) {
+    return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
+}
+
+static Quaternion ScaleQuaternion(const Quaternion& q, float s) {
+    return Quaternion{ q.x * s, q.y * s, q.z * s, q.w * s };
+}
+
+static Quaternion AddQuaternion(const Quaternion& a, const Quaternion& b) {
+    return Quaternion{ a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w };
+}
+
+Quaternion Slerp(const Quaternion& q0In, const Quaternion& q1In, float t)
+{
+    // q0,q1 は単位Quaternion前提（課題の注意点）
+    Quaternion q0 = q0In;
+    Quaternion q1 = q1In;
+
+    // 内積（cos）
+    float dot = DotQuaternion(q0, q1);
+
+    // 反対側（長い回転）を避ける：dot<0なら片方を反転
+    if (dot < 0.0f) {
+        q1 = ScaleQuaternion(q1, -1.0f);
+        dot = -dot;
+    }
+
+    // 数値誤差で1を超えるのを防ぐ
+    if (dot > 1.0f) dot = 1.0f;
+
+    // ほぼ同じ向きなら Lerp で近似（sin(theta)が0に近くなるのを回避）
+    const float DOT_THRESHOLD = 0.9995f;
+    if (dot > DOT_THRESHOLD) {
+        // lerp: (1-t)q0 + t q1
+        Quaternion r = AddQuaternion(ScaleQuaternion(q0, 1.0f - t), ScaleQuaternion(q1, t));
+        // ※注意点にある通り「Slerp内で正規化は避ける」方針ならここで返す
+        // ただ、ここだけは誤差が出やすいので課題的に見た目一致を優先するなら正規化しても良い。
+        // 指示に合わせて「正規化しない」版にしている。
+        return r;
+    }
+
+    // 角度
+    float theta = acosf(dot);
+    float sinTheta = sinf(theta);
+
+    // scale0 = sin((1-t)θ)/sinθ, scale1 = sin(tθ)/sinθ
+    float scale0 = sinf((1.0f - t) * theta) / sinTheta;
+    float scale1 = sinf(t * theta) / sinTheta;
+
+    Quaternion r = AddQuaternion(ScaleQuaternion(q0, scale0), ScaleQuaternion(q1, scale1));
+    return r;
+}
