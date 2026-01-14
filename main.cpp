@@ -223,7 +223,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Quaternion normalQ = NormalizeQuaternion(q1);
 	Quaternion mul1 = MultiplyQuaternion(q1, q2);
 	Quaternion mul2 = MultiplyQuaternion(q2, q1);
-	float normQ = NormQuaternion(q1);
+	//float normQ = NormQuaternion(q1);
 
 
 
@@ -490,7 +490,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 		// ===== DirectionToDirection 確認（完成イメージ用）=====
-		//const int kRowHeight = 20;   // 1行の高さ（見やすければ調整OK）
+		const int kRowHeight = 20;   // 1行の高さ（見やすければ調整OK）
 
 		Vector3 from0 = Normalize(Vector3{ 1.0f, 0.7f, 0.5f });
 		Vector3 to0 = -from0;
@@ -517,7 +517,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//Novice::ScreenPrintf(0, kRowHeight * 12, "rotateMatrix2");
 		//MatrixScreenPrintf(0, kRowHeight * 13, rotateMatrix2);
 
-		int y = 0;
+
+		//01_03確認課題
+		/*int y = 0;
 
 		Novice::ScreenPrintf(0, y, "Identity");
 		y += 20;
@@ -557,8 +559,27 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		y += 40;
 		Novice::ScreenPrintf(0, y, "Norm");
 		y += 20;
-		Novice::ScreenPrintf(0, y, "%.2f", normQ);
+		Novice::ScreenPrintf(0, y, "%.2f", normQ);*/
 
+		//01_04確認課題
+		Quaternion rotation = MakeRotateAxisAngleQuaternion(
+			Normalize(Vector3{ 1.0f, 0.4f, -0.2f }), 0.45f);
+
+		Vector3 pointY = { 2.1f, -0.9f, 1.3f };
+
+		Matrix4x4 rotateM = MakeRotateMatrix(rotation);
+
+		Vector3 rotateByQuaternion = RotateVector(pointY, rotation);
+		Vector3 rotateByMatrix = Transform(pointY, rotateM);
+
+		Novice::ScreenPrintf(0, kRowHeight * 0, "rotation");
+		Novice::ScreenPrintf(0, kRowHeight * 1,
+			"%.2f %.2f %.2f %.2f",
+			rotation.x, rotation.y, rotation.z, rotation.w);
+
+		MatrixScreenPrintf(0, kRowHeight * 3, rotateM);
+		VectorScreenPrintf(0, kRowHeight * 8, rotateByQuaternion, "rotateByQuaternion");
+		VectorScreenPrintf(0, kRowHeight * 9, rotateByMatrix, "rotateByMatrix");
 
 
 		//円錐振り子の球描画
